@@ -1,5 +1,5 @@
 
-import type { Flight } from '@/pages/Index';
+import type { Flight } from '@/hooks/useFlights';
 
 interface CountryDays {
   [country: string]: number;
@@ -14,7 +14,7 @@ export const calculateDaysInCountry = (
   
   // Sort flights by departure date
   const sortedFlights = [...flights].sort((a, b) => 
-    new Date(a.departureDate).getTime() - new Date(b.departureDate).getTime()
+    new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime()
   );
 
   // Track current location and date
@@ -22,14 +22,14 @@ export const calculateDaysInCountry = (
   let currentDate = new Date(startDate);
 
   for (const flight of sortedFlights) {
-    const flightDeparture = new Date(flight.departureDate);
-    const flightArrival = new Date(flight.arrivalDate);
+    const flightDeparture = new Date(flight.departure_date);
+    const flightArrival = new Date(flight.arrival_date);
 
     // If this is the first flight or we're starting tracking
     if (currentCountry === null) {
       // If the flight departs after our start date, assume we were in departure country
       if (flightDeparture >= startDate) {
-        currentCountry = flight.departureCountry;
+        currentCountry = flight.departure_country;
       }
     }
 
@@ -47,7 +47,7 @@ export const calculateDaysInCountry = (
 
     // Update current country to arrival country
     if (flightArrival <= endDate) {
-      currentCountry = flight.arrivalCountry;
+      currentCountry = flight.arrival_country;
       currentDate = new Date(flightArrival);
     }
   }
