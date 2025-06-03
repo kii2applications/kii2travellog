@@ -4,11 +4,12 @@ import { CountryStats } from '@/components/CountryStats';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { FlightList } from '@/components/FlightList';
 import { FlightForm } from '@/components/FlightForm';
+import { ExcelImport } from '@/components/ExcelImport';
 import { Header } from '@/components/Header';
 import { Auth } from '@/components/auth/Auth';
 import { useAuth } from '@/hooks/useAuth';
 import { useFlights } from '@/hooks/useFlights';
-import { Plane, Calendar, MapPin, TrendingUp } from 'lucide-react';
+import { Plane, Calendar, MapPin, TrendingUp, FileSpreadsheet } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -104,7 +105,7 @@ const Index = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-white/50 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-4 bg-white/50 backdrop-blur-sm">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Dashboard
@@ -116,6 +117,10 @@ const Index = () => {
             <TabsTrigger value="add" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Add Flight
+            </TabsTrigger>
+            <TabsTrigger value="import" className="flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4" />
+              Import
             </TabsTrigger>
           </TabsList>
 
@@ -147,6 +152,12 @@ const Index = () => {
                   <FlightForm />
                 </CardContent>
               </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="import">
+            <div className="max-w-4xl mx-auto">
+              <ExcelImport />
             </div>
           </TabsContent>
         </Tabs>
