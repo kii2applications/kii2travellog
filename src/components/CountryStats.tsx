@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,16 +18,8 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   const countryStats = useMemo(() => {
     if (!dateRange.from || !dateRange.to || !flights) return [];
 
-    // Convert Supabase flights to the format expected by calculateDaysInCountry
-    const formattedFlights = flights.map(flight => ({
-      id: flight.id,
-      departureCountry: flight.departure_country,
-      arrivalCountry: flight.arrival_country,
-      departureDate: flight.departure_date,
-      arrivalDate: flight.arrival_date,
-    }));
-
-    const stats = calculateDaysInCountry(formattedFlights, dateRange.from, dateRange.to);
+    // Pass flights directly to calculateDaysInCountry - no transformation needed
+    const stats = calculateDaysInCountry(flights, dateRange.from, dateRange.to);
     
     return Object.entries(stats)
       .map(([country, days]) => ({ country, days }))
