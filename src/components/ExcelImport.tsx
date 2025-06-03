@@ -76,6 +76,7 @@ export const ExcelImport = () => {
           description: `Successfully loaded ${rows.length} rows from ${file.name}`,
         });
       } catch (error) {
+        console.error('Error reading file:', error);
         toast({
           title: "Error",
           description: "Failed to read Excel file. Please ensure it's a valid .xlsx or .xls file.",
@@ -139,41 +140,48 @@ export const ExcelImport = () => {
     let successCount = 0;
     let errorCount = 0;
 
+    console.log('Starting import with column mapping:', columnMapping);
+    console.log('Sample data row:', excelData[0]);
+
     for (const row of excelData) {
       try {
-        const departureDate = formatDate(row[columnMapping.departureCountry]);
+        const departureDate = formatDate(row[columnMapping.departureDate]);
         const arrivalDate = formatDate(row[columnMapping.arrivalDate]);
         
+        console.log('Processing row:', {
+          departureCountry: row[columnMapping.departureCountry],
+          arrivalCountry: row[columnMapping.arrivalCountry],
+          departureDate,
+          arrivalDate
+        });
+        
         if (!departureDate || !arrivalDate) {
+          console.error('Invalid dates for row:', row);
           errorCount++;
           continue;
         }
 
-        await new Promise<void>((resolve, reject) => {
-          const originalAddFlight = addFlight;
-          
-          // Create a wrapper that resolves/rejects based on the mutation result
-          const flightData = {
-            departure_country: String(row[columnMapping.departureCountry] || '').trim(),
-            arrival_country: String(row[columnMapping.arrivalCountry] || '').trim(),
-            departure_date: departureDate,
-            arrival_date: arrivalDate,
-          };
+        const flightData = {
+          departure_country: String(row[columnMapping.departureCountry] || '').trim(),
+          arrival_country: String(row[columnMapping.arrivalCountry] || '').trim(),
+          departure_date: departureDate,
+          arrival_date: arrivalDate,
+        };
 
-          if (!flightData.departure_country || !flightData.arrival_country) {
-            reject(new Error('Missing country data'));
-            return;
-          }
+        if (!flightData.departure_country || !flightData.arrival_country) {
+          console.error('Missing country data for row:', row);
+          errorCount++;
+          continue;
+        }
 
-          originalAddFlight(flightData);
-          
-          // Small delay to prevent overwhelming the API
-          setTimeout(resolve, 100);
-        });
-
+        console.log('Adding flight:', flightData);
+        addFlight(flightData);
         successCount++;
+        
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
-        console.error('Error importing row:', error);
+        console.error('Error importing row:', error, row);
         errorCount++;
       }
     }
@@ -186,16 +194,18 @@ export const ExcelImport = () => {
       variant: errorCount > 0 ? "destructive" : "default"
     });
 
-    // Reset form
-    setExcelData([]);
-    setExcelColumns([]);
-    setColumnMapping({
-      departureCountry: '',
-      arrivalCountry: '',
-      departureDate: '',
-      arrivalDate: ''
-    });
-    setFileName('');
+    // Reset form if successful
+    if (errorCount === 0) {
+      setExcelData([]);
+      setExcelColumns([]);
+      setColumnMapping({
+        departureCountry: '',
+        arrivalCountry: '',
+        departureDate: '',
+        arrivalDate: ''
+      });
+      setFileName('');
+    }
   };
 
   const isMappingComplete = validateMapping();
@@ -364,7 +374,7 @@ export const ExcelImport = () => {
                   <AlertCircle className="h-4 w-4" />
                   Please map all required fields to enable import
                 </p>
-              )}
+                )}
             </div>
           </div>
         )}
