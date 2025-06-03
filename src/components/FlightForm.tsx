@@ -3,20 +3,16 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import { CalendarIcon, Plane } from 'lucide-react';
 import { format } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
-import type { Flight } from '@/pages/Index';
+import { useFlights } from '@/hooks/useFlights';
 
-interface FlightFormProps {
-  onAddFlight: (flight: Omit<Flight, 'id'>) => void;
-}
-
-export const FlightForm: React.FC<FlightFormProps> = ({ onAddFlight }) => {
+export const FlightForm = () => {
+  const { addFlight, isAddingFlight } = useFlights();
   const [formData, setFormData] = useState({
     departureCountry: '',
     arrivalCountry: '',
@@ -45,11 +41,11 @@ export const FlightForm: React.FC<FlightFormProps> = ({ onAddFlight }) => {
       return;
     }
 
-    onAddFlight({
-      departureCountry: formData.departureCountry,
-      arrivalCountry: formData.arrivalCountry,
-      departureDate: format(formData.departureDate, 'yyyy-MM-dd'),
-      arrivalDate: format(formData.arrivalDate, 'yyyy-MM-dd'),
+    addFlight({
+      departure_country: formData.departureCountry,
+      arrival_country: formData.arrivalCountry,
+      departure_date: format(formData.departureDate, 'yyyy-MM-dd'),
+      arrival_date: format(formData.arrivalDate, 'yyyy-MM-dd'),
     });
 
     // Reset form
@@ -58,11 +54,6 @@ export const FlightForm: React.FC<FlightFormProps> = ({ onAddFlight }) => {
       arrivalCountry: '',
       departureDate: undefined,
       arrivalDate: undefined,
-    });
-
-    toast({
-      title: "Flight Added",
-      description: "Your flight has been successfully logged!",
     });
   };
 
@@ -153,9 +144,10 @@ export const FlightForm: React.FC<FlightFormProps> = ({ onAddFlight }) => {
       <Button 
         type="submit" 
         className="w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200"
+        disabled={isAddingFlight}
       >
         <Plane className="mr-2 h-4 w-4" />
-        Add Flight
+        {isAddingFlight ? "Adding Flight..." : "Add Flight"}
       </Button>
     </form>
   );

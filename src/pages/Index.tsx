@@ -1,47 +1,20 @@
 
-import React, { useState, useMemo } from 'react';
-import { FlightForm } from '@/components/FlightForm';
+import React, { useState } from 'react';
 import { CountryStats } from '@/components/CountryStats';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { FlightList } from '@/components/FlightList';
+import { FlightForm } from '@/components/FlightForm';
+import { Header } from '@/components/Header';
+import { Auth } from '@/components/auth/Auth';
+import { useAuth } from '@/hooks/useAuth';
+import { useFlights } from '@/hooks/useFlights';
 import { Plane, Calendar, MapPin, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export interface Flight {
-  id: string;
-  departureCountry: string;
-  arrivalCountry: string;
-  departureDate: string;
-  arrivalDate: string;
-}
-
-const sampleFlights: Flight[] = [
-  {
-    id: '1',
-    departureCountry: 'United States',
-    arrivalCountry: 'France',
-    departureDate: '2024-01-15',
-    arrivalDate: '2024-01-16'
-  },
-  {
-    id: '2',
-    departureCountry: 'France',
-    arrivalCountry: 'Germany',
-    departureDate: '2024-02-10',
-    arrivalDate: '2024-02-10'
-  },
-  {
-    id: '3',
-    departureCountry: 'Germany',
-    arrivalCountry: 'United States',
-    departureDate: '2024-03-05',
-    arrivalDate: '2024-03-06'
-  }
-];
-
 const Index = () => {
-  const [flights, setFlights] = useState<Flight[]>(sampleFlights);
+  const { user, loading } = useAuth();
+  const { flights } = useFlights();
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -50,27 +23,32 @@ const Index = () => {
     to: new Date()
   });
 
-  const addFlight = (flight: Omit<Flight, 'id'>) => {
-    const newFlight = {
-      ...flight,
-      id: Date.now().toString()
-    };
-    setFlights(prev => [...prev, newFlight]);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <Plane className="h-12 w-12 mx-auto mb-4 text-blue-500 animate-pulse" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const deleteFlight = (id: string) => {
-    setFlights(prev => prev.filter(flight => flight.id !== id));
-  };
+  if (!user) {
+    return <Auth />;
+  }
 
-  const totalFlights = flights.length;
+  const totalFlights = flights?.length || 0;
   const uniqueCountries = new Set([
-    ...flights.map(f => f.departureCountry),
-    ...flights.map(f => f.arrivalCountry)
+    ...(flights?.map(f => f.departure_country) || []),
+    ...(flights?.map(f => f.arrival_country) || [])
   ]).size;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
       <div className="container mx-auto px-4 py-8">
+        <Header />
+
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -146,17 +124,11 @@ const Index = () => {
               dateRange={dateRange}
               onDateRangeChange={setDateRange}
             />
-            <CountryStats 
-              flights={flights}
-              dateRange={dateRange}
-            />
+            <CountryStats dateRange={dateRange} />
           </TabsContent>
 
           <TabsContent value="flights">
-            <FlightList 
-              flights={flights}
-              onDeleteFlight={deleteFlight}
-            />
+            <FlightList />
           </TabsContent>
 
           <TabsContent value="add">
@@ -172,7 +144,7 @@ const Index = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <FlightForm onAddFlight={addFlight} />
+                  <FlightForm />
                 </CardContent>
               </Card>
             </div>

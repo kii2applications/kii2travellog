@@ -4,21 +4,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, TrendingUp } from 'lucide-react';
 import { calculateDaysInCountry } from '@/utils/dateCalculations';
-import type { Flight } from '@/pages/Index';
+import { useFlights } from '@/hooks/useFlights';
 
 interface CountryStatsProps {
-  flights: Flight[];
   dateRange: {
     from: Date | undefined;
     to: Date | undefined;
   };
 }
 
-export const CountryStats: React.FC<CountryStatsProps> = ({ flights, dateRange }) => {
-  const countryStats = useMemo(() => {
-    if (!dateRange.from || !dateRange.to) return [];
+export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
+  const { flights, isLoading } = useFlights();
 
-    const stats = calculateDaysInCountry(flights, dateRange.from, dateRange.to);
+  const countryStats = useMemo(() => {
+    if (!dateRange.from || !dateRange.to || !flights) return [];
+
+    // Convert Supabase flights to the format expected by calculateDaysInCountry
+    const formattedFlights = flights.map(flight => ({
+      id: flight.id,
+      departureCountry: flight.departure_country,
+      arrivalCountry: flight.arrival_country,
+      departureDate: flight.departure_date,
+      arrivalDate: flight.arrival_date,
+    }));
+
+    const stats = calculateDaysInCountry(formattedFlights, dateRange.from, dateRange.to);
     
     return Object.entries(stats)
       .map(([country, days]) => ({ country, days }))
@@ -26,6 +36,24 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ flights, dateRange }
   }, [flights, dateRange]);
 
   const totalDays = countryStats.reduce((sum, stat) => sum + stat.days, 0);
+
+  if (isLoading) {
+    return (
+      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5 text-blue-500" />
+            Country Statistics
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500">
+            Loading travel statistics...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (countryStats.length === 0) {
     return (

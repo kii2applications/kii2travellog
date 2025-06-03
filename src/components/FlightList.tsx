@@ -5,14 +5,29 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plane, Trash2, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import type { Flight } from '@/pages/Index';
+import { useFlights } from '@/hooks/useFlights';
 
-interface FlightListProps {
-  flights: Flight[];
-  onDeleteFlight: (id: string) => void;
-}
+export const FlightList = () => {
+  const { flights, isLoading, deleteFlight, isDeletingFlight } = useFlights();
 
-export const FlightList: React.FC<FlightListProps> = ({ flights, onDeleteFlight }) => {
+  if (isLoading) {
+    return (
+      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plane className="h-5 w-5 text-blue-500" />
+            Flight History
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8 text-gray-500">
+            Loading your flights...
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (flights.length === 0) {
     return (
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
@@ -54,29 +69,30 @@ export const FlightList: React.FC<FlightListProps> = ({ flights, onDeleteFlight 
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      {flight.departureCountry}
+                      {flight.departure_country}
                     </Badge>
                     <Plane className="h-4 w-4 text-gray-400" />
                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                      {flight.arrivalCountry}
+                      {flight.arrival_country}
                     </Badge>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>Departure: {format(new Date(flight.departureDate), 'MMM dd, yyyy')}</span>
+                      <span>Departure: {format(new Date(flight.departure_date), 'MMM dd, yyyy')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>Arrival: {format(new Date(flight.arrivalDate), 'MMM dd, yyyy')}</span>
+                      <span>Arrival: {format(new Date(flight.arrival_date), 'MMM dd, yyyy')}</span>
                     </div>
                   </div>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onDeleteFlight(flight.id)}
+                  onClick={() => deleteFlight(flight.id)}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  disabled={isDeletingFlight}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
