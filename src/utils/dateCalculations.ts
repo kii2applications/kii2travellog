@@ -12,54 +12,82 @@ export const calculateDaysInCountry = (
 ): CountryDays => {
   const countryDays: CountryDays = {};
   
+  if (!flights || flights.length === 0) {
+    return countryDays;
+  }
+
   // Sort flights by departure date
   const sortedFlights = [...flights].sort((a, b) => 
     new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime()
   );
 
+  console.log('Calculating days for date range:', { startDate, endDate });
+  console.log('Sorted flights:', sortedFlights);
+
   // Track current location and date
   let currentCountry: string | null = null;
   let currentDate = new Date(startDate);
+
+  // If we have flights, assume we start in the departure country of the first flight
+  // or the country we were in before the first flight in our date range
+  const firstFlightInRange = sortedFlights.find(f => new Date(f.departure_date) >= startDate);
+  if (firstFlightInRange) {
+    currentCountry = firstFlightInRange.departure_country;
+  }
 
   for (const flight of sortedFlights) {
     const flightDeparture = new Date(flight.departure_date);
     const flightArrival = new Date(flight.arrival_date);
 
-    // If this is the first flight or we're starting tracking
-    if (currentCountry === null) {
-      // If the flight departs after our start date, assume we were in departure country
-      if (flightDeparture >= startDate) {
-        currentCountry = flight.departure_country;
+    console.log('Processing flight:', {
+      from: flight.departure_country,
+      to: flight.arrival_country,
+      departure: flightDeparture,
+      arrival: flightArrival,
+      currentCountry,
+      currentDate
+    });
+
+    // Skip flights that end before our start date
+    if (flightArrival < startDate) {
+      currentCountry = flight.arrival_country;
+      continue;
+    }
+
+    // Skip flights that start after our end date
+    if (flightDeparture > endDate) {
+      break;
+    }
+
+    // If flight departs after our current date and within our range
+    if (flightDeparture >= currentDate && flightDeparture <= endDate && currentCountry) {
+      const daysUntilDeparture = Math.ceil(
+        (Math.min(flightDeparture.getTime(), endDate.getTime()) - currentDate.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      
+      if (daysUntilDeparture > 0) {
+        countryDays[currentCountry] = (countryDays[currentCountry] || 0) + daysUntilDeparture;
+        console.log(`Added ${daysUntilDeparture} days to ${currentCountry}`);
       }
     }
 
-    // Count days in current country until departure
-    if (currentCountry && flightDeparture >= currentDate && flightDeparture <= endDate) {
-      const daysUntilDeparture = Math.max(0, 
-        Math.ceil((Math.min(flightDeparture.getTime(), endDate.getTime()) - currentDate.getTime()) / (1000 * 60 * 60 * 24))
-      );
-      
-      countryDays[currentCountry] = (countryDays[currentCountry] || 0) + daysUntilDeparture;
-      
-      // Update current date to departure date
-      currentDate = new Date(flightDeparture);
-    }
-
-    // Update current country to arrival country
-    if (flightArrival <= endDate) {
+    // Update current country and date
+    if (flightArrival >= startDate) {
       currentCountry = flight.arrival_country;
-      currentDate = new Date(flightArrival);
+      currentDate = new Date(Math.max(flightArrival.getTime(), currentDate.getTime()));
     }
   }
 
-  // Count remaining days in final country
+  // Count remaining days in final country until end date
   if (currentCountry && currentDate <= endDate) {
     const remainingDays = Math.ceil((endDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
     if (remainingDays > 0) {
       countryDays[currentCountry] = (countryDays[currentCountry] || 0) + remainingDays;
+      console.log(`Added ${remainingDays} remaining days to ${currentCountry}`);
     }
   }
 
+  console.log('Final country days:', countryDays);
   return countryDays;
 };
 
@@ -72,4 +100,28 @@ export const getTopCountries = (countryDays: CountryDays, limit: number = 5) => 
     .sort(([, daysA], [, daysB]) => daysB - daysA)
     .slice(0, limit)
     .map(([country, days]) => ({ country, days }));
+};
+
+export const calculateDaysByYear = (
+  flights: Flight[],
+  startDate: Date,
+  endDate: Date
+): Array<{ year: number; days: number }> => {
+  const yearlyData: { [year: number]: number } = {};
+  
+  // Get all years in the range
+  const startYear = startDate.getFullYear();
+  const endYear = endDate.getFullYear();
+  
+  for (let year = startYear; year <= endYear; year++) {
+    const yearStart = new Date(Math.max(new Date(year, 0, 1).getTime(), startDate.getTime()));
+    const yearEnd = new Date(Math.min(new Date(year, 11, 31).getTime(), endDate.getTime()));
+    
+    const countryDays = calculateDaysInCountry(flights, yearStart, yearEnd);
+    yearlyData[year] = getTotalTravelDays(countryDays);
+  }
+  
+  return Object.entries(yearlyData)
+    .map(([year, days]) => ({ year: parseInt(year), days }))
+    .sort((a, b) => a.year - b.year);
 };

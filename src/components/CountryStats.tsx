@@ -1,8 +1,11 @@
+
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { MapPin, Calendar, TrendingUp } from 'lucide-react';
-import { calculateDaysInCountry } from '@/utils/dateCalculations';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { calculateDaysInCountry, calculateDaysByYear } from '@/utils/dateCalculations';
 import { useFlights } from '@/hooks/useFlights';
 
 interface CountryStatsProps {
@@ -12,21 +15,35 @@ interface CountryStatsProps {
   };
 }
 
+const chartConfig = {
+  days: {
+    label: "Days",
+    color: "hsl(var(--chart-1))",
+  },
+};
+
 export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   const { flights, isLoading } = useFlights();
 
-  const countryStats = useMemo(() => {
-    if (!dateRange.from || !dateRange.to || !flights) return [];
+  const { countryStats, totalDays, yearlyData } = useMemo(() => {
+    if (!dateRange.from || !dateRange.to || !flights) {
+      return { countryStats: [], totalDays: 0, yearlyData: [] };
+    }
 
-    // Pass flights directly to calculateDaysInCountry - no transformation needed
+    console.log('Date range:', dateRange);
+    console.log('Available flights:', flights);
+
     const stats = calculateDaysInCountry(flights, dateRange.from, dateRange.to);
+    const yearly = calculateDaysByYear(flights, dateRange.from, dateRange.to);
     
-    return Object.entries(stats)
+    const countryStats = Object.entries(stats)
       .map(([country, days]) => ({ country, days }))
       .sort((a, b) => b.days - a.days);
-  }, [flights, dateRange]);
 
-  const totalDays = countryStats.reduce((sum, stat) => sum + stat.days, 0);
+    const totalDays = countryStats.reduce((sum, stat) => sum + stat.days, 0);
+
+    return { countryStats, totalDays, yearlyData: yearly };
+  }, [flights, dateRange]);
 
   if (isLoading) {
     return (
@@ -89,6 +106,48 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
           </div>
         </CardContent>
       </Card>
+
+      {yearlyData.length > 1 && (
+        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-purple-500" />
+              Travel Days by Year
+            </CardTitle>
+            <CardDescription>
+              Your travel activity over the years
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} className="h-[300px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={yearlyData}>
+                  <XAxis 
+                    dataKey="year" 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-sm"
+                  />
+                  <YAxis 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-sm"
+                  />
+                  <ChartTooltip
+                    content={<ChartTooltipContent />}
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                  />
+                  <Bar 
+                    dataKey="days" 
+                    fill="var(--color-days)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
         <CardHeader>
