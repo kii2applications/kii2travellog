@@ -1,4 +1,3 @@
-
 import type { Flight } from '@/hooks/useFlights';
 
 interface CountryDays {
@@ -102,6 +101,66 @@ export const getTopCountries = (countryDays: CountryDays, limit: number = 5) => 
     .map(([country, days]) => ({ country, days }));
 };
 
+export const calculateDaysByCustomYear = (
+  flights: Flight[],
+  startDate: Date,
+  endDate: Date,
+  yearStartMonth: number = 3, // April (0-indexed)
+  yearStartDay: number = 1
+): Array<{ year: string; countries: { [country: string]: number }; totalDays: number }> => {
+  const yearlyData: { [year: string]: { countries: { [country: string]: number }; totalDays: number } } = {};
+  
+  // Calculate the number of years based on custom year periods
+  const getCustomYear = (date: Date): string => {
+    const year = date.getFullYear();
+    const yearStart = new Date(year, yearStartMonth, yearStartDay);
+    
+    if (date < yearStart) {
+      return `${year - 1}-${year.toString().slice(-2)}`;
+    } else {
+      return `${year}-${(year + 1).toString().slice(-2)}`;
+    }
+  };
+
+  const getCustomYearBounds = (yearLabel: string) => {
+    const startYear = parseInt(yearLabel.split('-')[0]);
+    const yearStart = new Date(startYear, yearStartMonth, yearStartDay);
+    const yearEnd = new Date(startYear + 1, yearStartMonth, yearStartDay - 1);
+    return { yearStart, yearEnd };
+  };
+
+  // Get all custom years in the range
+  const firstCustomYear = getCustomYear(startDate);
+  const lastCustomYear = getCustomYear(endDate);
+  
+  // Generate all year labels between first and last
+  const firstYear = parseInt(firstCustomYear.split('-')[0]);
+  const lastYear = parseInt(lastCustomYear.split('-')[0]);
+  
+  for (let year = firstYear; year <= lastYear; year++) {
+    const yearLabel = `${year}-${(year + 1).toString().slice(-2)}`;
+    const { yearStart, yearEnd } = getCustomYearBounds(yearLabel);
+    
+    const periodStart = new Date(Math.max(yearStart.getTime(), startDate.getTime()));
+    const periodEnd = new Date(Math.min(yearEnd.getTime(), endDate.getTime()));
+    
+    if (periodStart <= periodEnd) {
+      const countryDays = calculateDaysInCountry(flights, periodStart, periodEnd);
+      const totalDays = getTotalTravelDays(countryDays);
+      
+      yearlyData[yearLabel] = {
+        countries: countryDays,
+        totalDays
+      };
+    }
+  }
+  
+  return Object.entries(yearlyData)
+    .map(([year, data]) => ({ year, ...data }))
+    .sort((a, b) => a.year.localeCompare(b.year));
+};
+
+// Keep the old function for backward compatibility
 export const calculateDaysByYear = (
   flights: Flight[],
   startDate: Date,

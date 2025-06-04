@@ -1,11 +1,10 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { MapPin, Calendar, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
-import { calculateDaysInCountry, calculateDaysByYear } from '@/utils/dateCalculations';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts';
+import { calculateDaysInCountry, calculateDaysByCustomYear } from '@/utils/dateCalculations';
 import { useFlights } from '@/hooks/useFlights';
 
 interface CountryStatsProps {
@@ -15,26 +14,42 @@ interface CountryStatsProps {
   };
 }
 
-const chartConfig = {
-  days: {
-    label: "Days",
-    color: "hsl(var(--chart-1))",
-  },
+// Generate colors for countries
+const getCountryColor = (index: number): string => {
+  const colors = [
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))', 
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#8b5cf6', // purple
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#06b6d4', // cyan
+    '#84cc16', // lime
+    '#f97316', // orange
+    '#ec4899', // pink
+    '#6366f1', // indigo
+  ];
+  return colors[index % colors.length];
 };
 
 export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   const { flights, isLoading } = useFlights();
 
-  const { countryStats, totalDays, yearlyData } = useMemo(() => {
+  const { countryStats, totalDays, yearlyData, chartConfig } = useMemo(() => {
     if (!dateRange.from || !dateRange.to || !flights) {
-      return { countryStats: [], totalDays: 0, yearlyData: [] };
+      return { countryStats: [], totalDays: 0, yearlyData: [], chartConfig: {} };
     }
 
     console.log('Date range:', dateRange);
     console.log('Available flights:', flights);
 
     const stats = calculateDaysInCountry(flights, dateRange.from, dateRange.to);
-    const yearly = calculateDaysByYear(flights, dateRange.from, dateRange.to);
+    // Use custom financial year (April to March) - you can modify these values
+    const yearly = calculateDaysByCustomYear(flights, dateRange.from, dateRange.to, 3, 1); // April 1st
     
     const countryStats = Object.entries(stats)
       .map(([country, days]) => ({ country, days }))
@@ -42,7 +57,31 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
 
     const totalDays = countryStats.reduce((sum, stat) => sum + stat.days, 0);
 
-    return { countryStats, totalDays, yearlyData: yearly };
+    // Get all unique countries from yearly data for chart
+    const allCountries = new Set<string>();
+    yearly.forEach(yearData => {
+      Object.keys(yearData.countries).forEach(country => allCountries.add(country));
+    });
+
+    // Create chart config with colors for each country
+    const chartConfig: any = {};
+    Array.from(allCountries).forEach((country, index) => {
+      chartConfig[country] = {
+        label: country,
+        color: getCountryColor(index),
+      };
+    });
+
+    // Transform yearly data for the chart
+    const chartData = yearly.map(yearData => {
+      const dataPoint: any = { year: yearData.year };
+      Array.from(allCountries).forEach(country => {
+        dataPoint[country] = yearData.countries[country] || 0;
+      });
+      return dataPoint;
+    });
+
+    return { countryStats, totalDays, yearlyData: chartData, chartConfig };
   }, [flights, dateRange]);
 
   if (isLoading) {
@@ -112,16 +151,16 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-purple-500" />
-              Travel Days by Year
+              Travel Days by Custom Year (Apr-Mar)
             </CardTitle>
             <CardDescription>
-              Your travel activity over the years
+              Your travel activity by country across custom financial years
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px]">
+            <ChartContainer config={chartConfig} className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={yearlyData}>
+                <BarChart data={yearlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                   <XAxis 
                     dataKey="year" 
                     tickLine={false}
@@ -137,11 +176,16 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
                     content={<ChartTooltipContent />}
                     cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
                   />
-                  <Bar 
-                    dataKey="days" 
-                    fill="var(--color-days)"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Legend />
+                  {Object.keys(chartConfig).map((country) => (
+                    <Bar
+                      key={country}
+                      dataKey={country}
+                      stackId="countries"
+                      fill={chartConfig[country].color}
+                      radius={0}
+                    />
+                  ))}
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -168,12 +212,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
                 <div key={country} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`w-4 h-4 rounded-full ${
-                        index === 0 ? 'bg-blue-500' :
-                        index === 1 ? 'bg-green-500' :
-                        index === 2 ? 'bg-purple-500' :
-                        'bg-gray-400'
-                      }`} />
+                      <div className={`w-4 h-4 rounded-full`} style={{ backgroundColor: getCountryColor(index) }} />
                       <span className="font-medium text-gray-900">{country}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -187,13 +226,11 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        index === 0 ? 'bg-blue-500' :
-                        index === 1 ? 'bg-green-500' :
-                        index === 2 ? 'bg-purple-500' :
-                        'bg-gray-400'
-                      }`}
-                      style={{ width: `${percentage}%` }}
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${percentage}%`, 
+                        backgroundColor: getCountryColor(index)
+                      }}
                     />
                   </div>
                 </div>
