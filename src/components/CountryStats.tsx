@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +10,8 @@ import { useFlights } from '@/hooks/useFlights';
 
 interface CountryStatsProps {
   dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
+    from: Date;
+    to: Date;
   };
 }
 
@@ -40,7 +41,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   const { flights, isLoading } = useFlights();
 
   const { countryStats, totalDays, yearlyData, chartConfig } = useMemo(() => {
-    if (!dateRange.from || !dateRange.to || !flights) {
+    if (!flights) {
       return { countryStats: [], totalDays: 0, yearlyData: [], chartConfig: {} };
     }
 

@@ -38,7 +38,9 @@ const Index = () => {
 
           {/* Right Column - Stats */}
           <div className="space-y-6">
-            <CountryStats dateRange={dateRange} />
+            {dateRange.from && dateRange.to && (
+              <CountryStats dateRange={{ from: dateRange.from, to: dateRange.to }} />
+            )}
           </div>
         </div>
 
