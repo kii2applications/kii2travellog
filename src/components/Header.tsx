@@ -5,7 +5,12 @@ import { LogOut, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export const Header = () => {
-  const { user, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
+
+  // Don't render anything while loading or if no user is authenticated
+  if (loading || !user) {
+    return null;
+  }
 
   return (
     <div className="flex items-center justify-between mb-8">

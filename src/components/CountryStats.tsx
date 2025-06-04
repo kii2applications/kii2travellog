@@ -159,19 +159,26 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[400px]">
+            <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={yearlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                <BarChart 
+                  data={yearlyData} 
+                  layout="horizontal"
+                  margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
+                >
                   <XAxis 
-                    dataKey="year" 
+                    type="number"
                     tickLine={false}
                     axisLine={false}
                     className="text-sm"
                   />
                   <YAxis 
+                    type="category"
+                    dataKey="year"
                     tickLine={false}
                     axisLine={false}
                     className="text-sm"
+                    width={50}
                   />
                   <ChartTooltip
                     content={<ChartTooltipContent />}
