@@ -10,29 +10,29 @@ import { useFlights } from '@/hooks/useFlights';
 
 interface CountryStatsProps {
   dateRange: {
-    from: Date;
-    to: Date;
+    from?: Date;
+    to?: Date;
   };
 }
 
 // Generate colors for countries
 const getCountryColor = (index: number): string => {
   const colors = [
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))', 
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
-    'hsl(var(--chart-5))',
     '#3b82f6', // blue
-    '#10b981', // green
-    '#8b5cf6', // purple
+    '#10b981', // emerald
     '#f59e0b', // amber
     '#ef4444', // red
+    '#8b5cf6', // violet
     '#06b6d4', // cyan
     '#84cc16', // lime
     '#f97316', // orange
     '#ec4899', // pink
     '#6366f1', // indigo
+    '#14b8a6', // teal
+    '#a855f7', // purple
+    '#059669', // emerald-600
+    '#dc2626', // red-600
+    '#7c3aed', // violet-600
   ];
   return colors[index % colors.length];
 };
@@ -41,7 +41,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   const { flights, isLoading } = useFlights();
 
   const { countryStats, totalDays, yearlyData, chartConfig } = useMemo(() => {
-    if (!flights) {
+    if (!flights || !dateRange.from || !dateRange.to) {
       return { countryStats: [], totalDays: 0, yearlyData: [], chartConfig: {} };
     }
 
@@ -49,7 +49,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
     console.log('Available flights:', flights);
 
     const stats = calculateDaysInCountry(flights, dateRange.from, dateRange.to);
-    // Use custom financial year (April to March) - you can modify these values
+    // Use custom financial year (April to March)
     const yearly = calculateDaysByCustomYear(flights, dateRange.from, dateRange.to, 3, 1); // April 1st
     
     console.log('Yearly data calculated:', yearly);
@@ -164,27 +164,26 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {yearlyData.length > 1 ? (
+            {yearlyData.length > 0 ? (
               <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
                     data={yearlyData} 
-                    layout="horizontal"
-                    margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                   >
                     <XAxis 
-                      type="number"
-                      tickLine={false}
-                      axisLine={false}
-                      className="text-sm"
-                    />
-                    <YAxis 
-                      type="category"
                       dataKey="year"
                       tickLine={false}
                       axisLine={false}
                       className="text-sm"
-                      width={50}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      tickLine={false}
+                      axisLine={false}
+                      className="text-sm"
                     />
                     <ChartTooltip
                       content={<ChartTooltipContent />}
