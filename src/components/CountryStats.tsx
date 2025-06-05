@@ -52,6 +52,8 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
     // Use custom financial year (April to March) - you can modify these values
     const yearly = calculateDaysByCustomYear(flights, dateRange.from, dateRange.to, 3, 1); // April 1st
     
+    console.log('Yearly data calculated:', yearly);
+    
     const countryStats = Object.entries(stats)
       .map(([country, days]) => ({ country, days }))
       .sort((a, b) => b.days - a.days);
@@ -73,7 +75,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
       };
     });
 
-    // Transform yearly data for the chart
+    // Transform yearly data for the chart - ensure we have proper data structure
     const chartData = yearly.map(yearData => {
       const dataPoint: any = { year: yearData.year };
       Array.from(allCountries).forEach(country => {
@@ -81,6 +83,9 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
       });
       return dataPoint;
     });
+
+    console.log('Chart data transformed:', chartData);
+    console.log('Chart config:', chartConfig);
 
     return { countryStats, totalDays, yearlyData: chartData, chartConfig };
   }, [flights, dateRange]);
@@ -147,7 +152,7 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
         </CardContent>
       </Card>
 
-      {yearlyData.length > 1 && (
+      {yearlyData.length > 0 && Object.keys(chartConfig).length > 0 && (
         <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -159,44 +164,51 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart 
-                  data={yearlyData} 
-                  layout="horizontal"
-                  margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
-                >
-                  <XAxis 
-                    type="number"
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-sm"
-                  />
-                  <YAxis 
-                    type="category"
-                    dataKey="year"
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-sm"
-                    width={50}
-                  />
-                  <ChartTooltip
-                    content={<ChartTooltipContent />}
-                    cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
-                  />
-                  <Legend />
-                  {Object.keys(chartConfig).map((country) => (
-                    <Bar
-                      key={country}
-                      dataKey={country}
-                      stackId="countries"
-                      fill={chartConfig[country].color}
-                      radius={0}
+            {yearlyData.length > 1 ? (
+              <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={yearlyData} 
+                    layout="horizontal"
+                    margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
+                  >
+                    <XAxis 
+                      type="number"
+                      tickLine={false}
+                      axisLine={false}
+                      className="text-sm"
                     />
-                  ))}
-                </BarChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+                    <YAxis 
+                      type="category"
+                      dataKey="year"
+                      tickLine={false}
+                      axisLine={false}
+                      className="text-sm"
+                      width={50}
+                    />
+                    <ChartTooltip
+                      content={<ChartTooltipContent />}
+                      cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
+                    />
+                    <Legend />
+                    {Object.keys(chartConfig).map((country) => (
+                      <Bar
+                        key={country}
+                        dataKey={country}
+                        stackId="countries"
+                        fill={chartConfig[country].color}
+                        radius={0}
+                      />
+                    ))}
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Need data spanning multiple years to show yearly comparison chart</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

@@ -52,6 +52,9 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                   selected={dateRange.from}
                   onSelect={(date) => onDateRangeChange({ ...dateRange, from: date })}
                   initialFocus
+                  captionLayout="dropdown-buttons"
+                  fromYear={2000}
+                  toYear={2030}
                   className="p-3 pointer-events-auto"
                 />
               </PopoverContent>
@@ -79,6 +82,9 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
                   selected={dateRange.to}
                   onSelect={(date) => onDateRangeChange({ ...dateRange, to: date })}
                   initialFocus
+                  captionLayout="dropdown-buttons"
+                  fromYear={2000}
+                  toYear={2030}
                   className="p-3 pointer-events-auto"
                 />
               </PopoverContent>
@@ -86,7 +92,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2 flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -124,6 +130,19 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             className="bg-white/50"
           >
             This year
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const today = new Date();
+              const fiveYearsAgo = new Date(today);
+              fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+              onDateRangeChange({ from: fiveYearsAgo, to: today });
+            }}
+            className="bg-white/50"
+          >
+            Last 5 years
           </Button>
         </div>
       </CardContent>
