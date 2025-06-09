@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      country_targets: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          minimum_days: number
+          updated_at: string
+          user_id: string
+          year_start_day: number
+          year_start_month: number
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: string
+          minimum_days: number
+          updated_at?: string
+          user_id: string
+          year_start_day?: number
+          year_start_month?: number
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          minimum_days?: number
+          updated_at?: string
+          user_id?: string
+          year_start_day?: number
+          year_start_month?: number
+        }
+        Relationships: []
+      }
       flights: {
         Row: {
           arrival_country: string
@@ -63,6 +96,66 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_events: {
+        Row: {
+          country: string
+          created_at: string
+          description: string | null
+          event_date: string
+          event_name: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_name: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_name?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          created_at: string
+          custom_year_start_day: number
+          custom_year_start_month: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_year_start_day?: number
+          custom_year_start_month?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_year_start_day?: number
+          custom_year_start_month?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
