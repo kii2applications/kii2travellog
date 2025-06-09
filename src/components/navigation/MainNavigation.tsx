@@ -49,7 +49,7 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
   onNavigate 
 }) => {
   return (
-    <nav className={cn("space-y-2", className)}>
+    <nav className={cn("space-y-1", className)}>
       {navigationItems.map((item) => (
         <NavLink
           key={item.href}
@@ -57,14 +57,14 @@ export const MainNavigation: React.FC<MainNavigationProps> = ({
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors font-system",
               isActive
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                ? "bg-blue-500 text-white shadow-sm"
+                : "text-gray-700 hover:bg-gray-100 active:bg-gray-200"
             )
           }
         >
-          <item.icon className="h-4 w-4" />
+          <item.icon className="h-5 w-5" />
           {item.title}
         </NavLink>
       ))}

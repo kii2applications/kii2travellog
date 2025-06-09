@@ -23,10 +23,10 @@ function AppContent() {
   // Show loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600 font-system">Loading...</p>
         </div>
       </div>
     );
@@ -38,7 +38,7 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gray-50 font-system">
       <Header />
       
       {/* PWA Install Button - Mobile optimized */}
@@ -48,7 +48,7 @@ function AppContent() {
         </div>
       </div>
 
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-20 md:pb-8">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/flights" element={<FlightsPage />} />

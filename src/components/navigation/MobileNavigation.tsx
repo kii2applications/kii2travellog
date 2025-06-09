@@ -41,7 +41,7 @@ const navigationItems = [
 
 export const MobileNavigation: React.FC = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden safe-area-bottom shadow-lg">
       <nav className="flex">
         {navigationItems.map((item) => (
           <NavLink
@@ -49,14 +49,14 @@ export const MobileNavigation: React.FC = () => {
             to={item.href}
             className={({ isActive }) =>
               cn(
-                "flex flex-col items-center justify-center px-2 py-3 min-h-[64px] flex-1 transition-colors",
+                "flex flex-col items-center justify-center px-2 py-3 min-h-[68px] flex-1 transition-colors font-system",
                 isActive
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-blue-500 bg-blue-50"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:bg-gray-100"
               )
             }
           >
-            <item.icon className="h-5 w-5 mb-1" />
+            <item.icon className="h-6 w-6 mb-1" />
             <span className="text-xs font-medium">{item.title}</span>
           </NavLink>
         ))}

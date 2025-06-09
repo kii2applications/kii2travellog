@@ -33,7 +33,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -82,7 +82,69 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-gray-50 text-foreground font-system;
+  }
+
+  /* React Native style typography */
+  h1 {
+    @apply text-2xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-lg font-medium;
+  }
+
+  p {
+    @apply text-base leading-relaxed;
+  }
+
+  /* React Native style spacing */
+  .rn-container {
+    @apply px-4 py-3;
+  }
+
+  .rn-section {
+    @apply mb-6;
+  }
+
+  /* React Native style cards */
+  .rn-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-3;
+  }
+
+  .rn-card-large {
+    @apply bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-4;
+  }
+
+  /* React Native style buttons */
+  .rn-button {
+    @apply bg-blue-500 text-white font-medium py-3 px-6 rounded-lg shadow-sm active:bg-blue-600 transition-colors;
+  }
+
+  .rn-button-outline {
+    @apply bg-transparent border border-blue-500 text-blue-500 font-medium py-3 px-6 rounded-lg active:bg-blue-50 transition-colors;
+  }
+
+  .rn-button-ghost {
+    @apply bg-transparent text-gray-700 font-medium py-3 px-6 rounded-lg active:bg-gray-100 transition-colors;
+  }
+
+  /* React Native style inputs */
+  .rn-input {
+    @apply w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-base focus:border-blue-500 focus:ring-0 transition-colors;
+  }
+
+  .rn-input-underline {
+    @apply w-full bg-transparent border-0 border-b-2 border-gray-300 px-0 py-3 text-base focus:border-blue-500 focus:ring-0 transition-colors rounded-none;
+  }
+
+  /* System font stack for React Native feel */
+  .font-system {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
 
   /* Mobile optimizations */
@@ -101,13 +163,13 @@
       @apply overflow-x-hidden;
     }
     
-    /* Better spacing on mobile */
-    .space-y-6 > * + * {
-      @apply mt-4;
+    /* React Native style spacing on mobile */
+    .rn-section {
+      @apply mb-4;
     }
     
-    .space-y-8 > * + * {
-      @apply mt-6;
+    .rn-card, .rn-card-large {
+      @apply mx-4 mb-3;
     }
   }
   
