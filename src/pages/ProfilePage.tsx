@@ -1,189 +1,88 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React from 'react';
+import { Settings, Grid3X3, Bookmark, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar, Target, Settings, Trash2 } from 'lucide-react';
-import { EventForm } from '@/components/events/EventForm';
-import { CountryTargetForm } from '@/components/targets/CountryTargetForm';
-import { useEvents } from '@/hooks/useEvents';
-import { useCountryTargets } from '@/hooks/useCountryTargets';
-import { format } from 'date-fns';
 
 export const ProfilePage: React.FC = () => {
-  const { events, addEvent, deleteEvent, isAddingEvent } = useEvents();
-  const { targets, addTarget, deleteTarget, isAddingTarget } = useCountryTargets();
-  const [activeTab, setActiveTab] = useState('events');
-
-  const handleEventSubmit = (data: any) => {
-    addEvent({
-      ...data,
-      event_date: format(data.event_date, 'yyyy-MM-dd'),
-    });
-  };
-
-  const handleTargetSubmit = (data: any) => {
-    addTarget(data);
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 pb-20 md:pb-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-          <p className="text-gray-600">Manage your travel events and country targets</p>
+    <div className="max-w-md mx-auto bg-black min-h-screen">
+      {/* Profile Header */}
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-white">your_username</h2>
+          <Button variant="ghost" size="sm" className="p-2 text-white hover:bg-gray-800">
+            <Settings className="h-6 w-6" />
+          </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="events" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Events
-            </TabsTrigger>
-            <TabsTrigger value="targets" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Country Targets
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="events" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Add New Event</CardTitle>
-                  <CardDescription>
-                    Add important events in countries you plan to visit
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <EventForm onSubmit={handleEventSubmit} isLoading={isAddingEvent} />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Events</CardTitle>
-                  <CardDescription>
-                    Upcoming events and important dates
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {events.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-4">
-                        No events added yet
-                      </p>
-                    ) : (
-                      events.map((event) => (
-                        <div
-                          key={event.id}
-                          className="flex items-start justify-between p-3 border rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <h4 className="font-medium">{event.event_name}</h4>
-                            <p className="text-sm text-muted-foreground">{event.country}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {format(new Date(event.event_date), 'PPP')}
-                            </p>
-                            {event.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {event.description}
-                              </p>
-                            )}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteEvent(event.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+        {/* Profile Stats */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 p-0.5">
+            <img
+              src="/placeholder.svg"
+              alt="Profile"
+              className="w-full h-full rounded-full object-cover border-2 border-black"
+            />
+          </div>
+          
+          <div className="flex-1 flex justify-around">
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">123</div>
+              <div className="text-xs text-gray-400">Posts</div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="targets" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Add Country Target</CardTitle>
-                  <CardDescription>
-                    Set minimum days targets for countries you want to visit
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CountryTargetForm onSubmit={handleTargetSubmit} isLoading={isAddingTarget} />
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Your Country Targets</CardTitle>
-                  <CardDescription>
-                    Minimum days you want to spend in each country
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {targets.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-4">
-                        No targets set yet
-                      </p>
-                    ) : (
-                      targets.map((target) => (
-                        <div
-                          key={target.id}
-                          className="flex items-center justify-between p-3 border rounded-lg"
-                        >
-                          <div>
-                            <h4 className="font-medium">{target.country}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Minimum {target.minimum_days} days
-                            </p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => deleteTarget(target.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">1.2K</div>
+              <div className="text-xs text-gray-400">Followers</div>
             </div>
-          </TabsContent>
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">456</div>
+              <div className="text-xs text-gray-400">Following</div>
+            </div>
+          </div>
+        </div>
 
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle>Travel Year Settings</CardTitle>
-                <CardDescription>
-                  Configure your custom travel year settings
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Settings functionality will be implemented here
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {/* Bio */}
+        <div className="mb-4">
+          <p className="text-white font-semibold">Your Name</p>
+          <p className="text-gray-300 text-sm">📍 Your Location</p>
+          <p className="text-gray-300 text-sm">✨ Your bio here</p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mb-6">
+          <Button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white">
+            Edit Profile
+          </Button>
+          <Button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white">
+            Share Profile
+          </Button>
+          <Button variant="ghost" size="sm" className="p-2 text-white hover:bg-gray-800">
+            <UserCheck className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-800">
+          <button className="flex-1 py-3 text-white border-b-2 border-white">
+            <Grid3X3 className="h-6 w-6 mx-auto" />
+          </button>
+          <button className="flex-1 py-3 text-gray-400">
+            <Bookmark className="h-6 w-6 mx-auto" />
+          </button>
+        </div>
+      </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-3 gap-1">
+        {Array.from({ length: 12 }).map((_, i) => (
+          <div key={i} className="aspect-square bg-gray-800">
+            <img
+              src="/placeholder.svg"
+              alt="Post"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
       </div>
     </div>
   );
