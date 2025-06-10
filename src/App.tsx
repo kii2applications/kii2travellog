@@ -2,11 +2,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import { HomePage } from '@/pages/HomePage';
-import { SearchPage } from '@/pages/SearchPage';
-import { CreatePage } from '@/pages/CreatePage';
-import { ReelsPage } from '@/pages/ReelsPage';
-import { ProfilePage } from '@/pages/ProfilePage';
+import Index from '@/pages/Index';
+import { FlightsPage } from '@/pages/FlightsPage';
+import { AddFlightPage } from '@/pages/AddFlightPage';
+import { RecommendationsPage } from '@/pages/RecommendationsPage';
 import { BottomNavigation } from '@/components/navigation/BottomNavigation';
 import { TopHeader } from '@/components/TopHeader';
 import './App.css';
@@ -24,11 +23,10 @@ function App() {
           {/* Main Content */}
           <main className="pb-16 pt-14">
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/create" element={<CreatePage />} />
-              <Route path="/reels" element={<ReelsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/" element={<Index />} />
+              <Route path="/flights" element={<FlightsPage />} />
+              <Route path="/add-flight" element={<AddFlightPage />} />
+              <Route path="/recommendations" element={<RecommendationsPage />} />
             </Routes>
           </main>
 

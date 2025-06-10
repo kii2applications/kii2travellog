@@ -64,90 +64,40 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
   }, [dateRange.to]);
 
   return (
-    <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+    <Card className="bg-gray-900 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-white">
           <CalendarIcon className="h-5 w-5 text-purple-500" />
           Date Range Filter
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-400">
           Select a date range to analyze your travel days
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">From Date</label>
-            <div className="flex gap-2">
-              <Input
-                type="date"
-                value={fromInput}
-                onChange={(e) => handleFromInputChange(e.target.value)}
-                className="flex-1 bg-white/50"
-              />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="bg-white/50"
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateRange.from}
-                    onSelect={(date) => onDateRangeChange({ ...dateRange, from: date })}
-                    initialFocus
-                    captionLayout="dropdown-buttons"
-                    fromYear={2000}
-                    toYear={2030}
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+            <label className="text-sm font-medium text-white">From Date</label>
+            <Input
+              type="date"
+              value={fromInput}
+              onChange={(e) => handleFromInputChange(e.target.value)}
+              className="bg-gray-800 border-gray-600 text-white"
+            />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">To Date</label>
-            <div className="flex gap-2">
-              <Input
-                type="date"
-                value={toInput}
-                onChange={(e) => handleToInputChange(e.target.value)}
-                className="flex-1 bg-white/50"
-              />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="bg-white/50"
-                  >
-                    <CalendarIcon className="h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={dateRange.to}
-                    onSelect={(date) => onDateRangeChange({ ...dateRange, to: date })}
-                    initialFocus
-                    captionLayout="dropdown-buttons"
-                    fromYear={2000}
-                    toYear={2030}
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+            <label className="text-sm font-medium text-white">To Date</label>
+            <Input
+              type="date"
+              value={toInput}
+              onChange={(e) => handleToInputChange(e.target.value)}
+              className="bg-gray-800 border-gray-600 text-white"
+            />
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2 flex-wrap">
+        <div className="mt-4 grid grid-cols-2 gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -157,7 +107,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               thirtyDaysAgo.setDate(today.getDate() - 30);
               onDateRangeChange({ from: thirtyDaysAgo, to: today });
             }}
-            className="bg-white/50"
+            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
           >
             Last 30 days
           </Button>
@@ -170,7 +120,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               oneYearAgo.setFullYear(today.getFullYear() - 1);
               onDateRangeChange({ from: oneYearAgo, to: today });
             }}
-            className="bg-white/50"
+            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
           >
             Last year
           </Button>
@@ -182,7 +132,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               const startOfYear = new Date(today.getFullYear(), 0, 1);
               onDateRangeChange({ from: startOfYear, to: today });
             }}
-            className="bg-white/50"
+            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
           >
             This year
           </Button>
@@ -195,7 +145,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               fiveYearsAgo.setFullYear(today.getFullYear() - 5);
               onDateRangeChange({ from: fiveYearsAgo, to: today });
             }}
-            className="bg-white/50"
+            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
           >
             Last 5 years
           </Button>

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { MapPin, Calendar, TrendingUp } from 'lucide-react';
+import { Map, Calendar, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend } from 'recharts';
 import { calculateDaysInCountry, calculateDaysByCustomYear } from '@/utils/dateCalculations';
 import { useFlights } from '@/hooks/useFlights';
@@ -92,15 +92,15 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
 
   if (isLoading) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="bg-gray-900 border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-500" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Map className="h-5 w-5 text-blue-500" />
             Country Statistics
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-400">
             Loading travel statistics...
           </div>
         </CardContent>
@@ -110,18 +110,18 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
 
   if (countryStats.length === 0) {
     return (
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="bg-gray-900 border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-500" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Map className="h-5 w-5 text-blue-500" />
             Country Statistics
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400">
             No travel data available for the selected date range
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-400">
             <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>Select a date range and add some flights to see your travel statistics</p>
           </div>
@@ -131,14 +131,14 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
   }
 
   return (
-    <div className="space-y-6">
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+    <div className="space-y-4">
+      <Card className="bg-gray-900 border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-white">
             <TrendingUp className="h-5 w-5 text-green-500" />
             Travel Summary
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400">
             {dateRange.from && dateRange.to && 
               `From ${dateRange.from.toLocaleDateString()} to ${dateRange.to.toLocaleDateString()}`
             }
@@ -146,79 +146,19 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
         </CardHeader>
         <CardContent>
           <div className="text-center">
-            <div className="text-3xl font-bold text-gray-900 mb-2">{totalDays}</div>
-            <div className="text-sm text-gray-600">Total travel days tracked</div>
+            <div className="text-3xl font-bold text-white mb-2">{totalDays}</div>
+            <div className="text-sm text-gray-400">Total travel days tracked</div>
           </div>
         </CardContent>
       </Card>
 
-      {yearlyData.length > 0 && Object.keys(chartConfig).length > 0 && (
-        <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-purple-500" />
-              Travel Days by Custom Year (Apr-Mar)
-            </CardTitle>
-            <CardDescription>
-              Your travel activity by country across custom financial years
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {yearlyData.length > 0 ? (
-              <ChartContainer config={chartConfig} className="h-[300px] md:h-[400px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
-                    data={yearlyData} 
-                    margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                  >
-                    <XAxis 
-                      dataKey="year"
-                      tickLine={false}
-                      axisLine={false}
-                      className="text-sm"
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis 
-                      tickLine={false}
-                      axisLine={false}
-                      className="text-sm"
-                    />
-                    <ChartTooltip
-                      content={<ChartTooltipContent />}
-                      cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
-                    />
-                    <Legend />
-                    {Object.keys(chartConfig).map((country) => (
-                      <Bar
-                        key={country}
-                        dataKey={country}
-                        stackId="countries"
-                        fill={chartConfig[country].color}
-                        radius={0}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Need data spanning multiple years to show yearly comparison chart</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="bg-white/70 backdrop-blur-sm border-0 shadow-lg">
+      <Card className="bg-gray-900 border-gray-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-500" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Map className="h-5 w-5 text-blue-500" />
             Days by Country
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400">
             Time spent in each country during the selected period
           </CardDescription>
         </CardHeader>
@@ -232,18 +172,18 @@ export const CountryStats: React.FC<CountryStatsProps> = ({ dateRange }) => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className={`w-4 h-4 rounded-full`} style={{ backgroundColor: getCountryColor(index) }} />
-                      <span className="font-medium text-gray-900">{country}</span>
+                      <span className="font-medium text-white">{country}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="bg-gray-100">
+                      <Badge variant="secondary" className="bg-gray-800 text-white">
                         {days} {days === 1 ? 'day' : 'days'}
                       </Badge>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-400">
                         {percentage.toFixed(1)}%
                       </span>
                     </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-700 rounded-full h-2">
                     <div 
                       className="h-2 rounded-full transition-all duration-500"
                       style={{ 
