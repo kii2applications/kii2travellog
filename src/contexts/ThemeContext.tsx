@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUserSettings } from '@/hooks/useUserSettings';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -21,9 +21,11 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { settings, updateSettings } = useUserSettings();
+  const { settings, updateSettings, isLoading } = useUserSettings();
+  const [localTheme, setLocalTheme] = useState<Theme>('dark'); // Default fallback
   
-  const theme = settings?.theme || 'dark';
+  // Use local theme when settings are loading, otherwise use settings theme
+  const theme = isLoading ? localTheme : (settings?.theme || 'dark');
   
   const getActualTheme = (theme: Theme): 'light' | 'dark' => {
     if (theme === 'system') {
@@ -35,7 +37,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const actualTheme = getActualTheme(theme);
 
   const setTheme = (newTheme: Theme) => {
-    updateSettings({ theme: newTheme });
+    setLocalTheme(newTheme);
+    if (!isLoading && updateSettings) {
+      updateSettings({ theme: newTheme });
+    }
   };
 
   useEffect(() => {
