@@ -8,6 +8,7 @@ export interface UserSettings {
   user_id: string;
   custom_year_start_month: number;
   custom_year_start_day: number;
+  theme: 'light' | 'dark' | 'system';
   created_at: string;
   updated_at: string;
 }
@@ -32,6 +33,7 @@ export const useUserSettings = () => {
         return {
           custom_year_start_month: 4, // April
           custom_year_start_day: 1,   // 1st
+          theme: 'dark' as const,     // Default theme
         };
       }
       
@@ -40,7 +42,11 @@ export const useUserSettings = () => {
   });
 
   const updateSettingsMutation = useMutation({
-    mutationFn: async (newSettings: { custom_year_start_month: number; custom_year_start_day: number }) => {
+    mutationFn: async (newSettings: { 
+      custom_year_start_month?: number; 
+      custom_year_start_day?: number;
+      theme?: 'light' | 'dark' | 'system';
+    }) => {
       const { data: existingSettings } = await supabase
         .from('user_settings')
         .select('id')
@@ -63,6 +69,9 @@ export const useUserSettings = () => {
           .from('user_settings')
           .insert([{
             ...newSettings,
+            custom_year_start_month: newSettings.custom_year_start_month || 4,
+            custom_year_start_day: newSettings.custom_year_start_day || 1,
+            theme: newSettings.theme || 'dark',
             user_id: (await supabase.auth.getUser()).data.user?.id,
           }])
           .select()
@@ -76,7 +85,7 @@ export const useUserSettings = () => {
       queryClient.invalidateQueries({ queryKey: ['user-settings'] });
       toast({
         title: "Settings Updated",
-        description: "Your custom year settings have been saved!",
+        description: "Your settings have been saved!",
       });
     },
     onError: (error: any) => {

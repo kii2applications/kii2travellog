@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Map, PlusSquare, Settings, User } from 'lucide-react';
+import { Home, Map, PlusSquare, Heart, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigationItems = [
@@ -23,13 +23,18 @@ const navigationItems = [
   {
     title: 'Recommendations',
     href: '/recommendations',
+    icon: Heart,
+  },
+  {
+    title: 'Settings',
+    href: '/settings',
     icon: Settings,
   },
 ];
 
 export const BottomNavigation: React.FC = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black border-t border-gray-800 z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
       <nav className="flex">
         {navigationItems.map((item) => (
           <NavLink
@@ -37,10 +42,10 @@ export const BottomNavigation: React.FC = () => {
             to={item.href}
             className={({ isActive }) =>
               cn(
-                "flex flex-col items-center justify-center px-4 py-2 min-h-[64px] flex-1 transition-colors",
+                "flex flex-col items-center justify-center px-2 py-2 min-h-[64px] flex-1 transition-colors",
                 isActive
-                  ? "text-white"
-                  : "text-gray-400 hover:text-gray-200 active:text-white"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               )
             }
           >
@@ -48,7 +53,7 @@ export const BottomNavigation: React.FC = () => {
               <>
                 <item.icon 
                   className={cn(
-                    "h-6 w-6 mb-1",
+                    "h-5 w-5 mb-1",
                     isActive ? "fill-current" : ""
                   )} 
                 />
