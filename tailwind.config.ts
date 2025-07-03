@@ -66,19 +66,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				gray: {
-					25: '#fafafa',
-					50: '#f9fafb',
-					100: '#f3f4f6',
-					200: '#e5e7eb',
-					300: '#d1d5db',
-					400: '#9ca3af',
-					500: '#6b7280',
-					600: '#4b5563',
-					700: '#374151',
-					800: '#1f2937',
-					900: '#111827',
-				}
+				glass: 'hsl(var(--glass-bg))'
+			},
+			boxShadow: {
+				'soft': 'var(--shadow-soft)',
+				'medium': 'var(--shadow-medium)',
+			},
+			transitionTimingFunction: {
+				'smooth': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

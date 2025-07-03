@@ -40,7 +40,7 @@ function AppContent() {
       <TopHeader />
       
       {/* Main Content */}
-      <main className="pb-16 pt-14">
+      <main className="pb-20 pt-16">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/flights" element={<FlightsPage />} />
