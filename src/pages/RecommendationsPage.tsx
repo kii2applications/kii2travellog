@@ -5,12 +5,15 @@ import { Calendar, MapPin, Target, TrendingUp } from 'lucide-react';
 import { useFlights } from '@/hooks/useFlights';
 import { useEvents } from '@/hooks/useEvents';
 import { useCountryTargets } from '@/hooks/useCountryTargets';
-import { format, addDays, isAfter, isBefore } from 'date-fns';
+import { useUserSettings } from '@/hooks/useUserSettings';
+import { format, addDays } from 'date-fns';
+import { calculateDaysInCountry } from '@/utils/dateCalculations';
 
 export const RecommendationsPage: React.FC = () => {
   const { flights } = useFlights();
   const { events } = useEvents();
   const { targets } = useCountryTargets();
+  const { settings } = useUserSettings();
 
   const recommendations = useMemo(() => {
     const recs: Array<{
@@ -69,40 +72,50 @@ export const RecommendationsPage: React.FC = () => {
 
     // Target-based recommendations
     targets.forEach(target => {
-      const countryFlights = flights.filter(f => 
-        f.arrival_country === target.country || f.departure_country === target.country
-      );
+      if (!settings) return;
 
-      if (countryFlights.length === 0) {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      
+      // Calculate custom year start date
+      const customYearStart = new Date(
+        currentYear, 
+        settings.custom_year_start_month - 1, 
+        settings.custom_year_start_day
+      );
+      
+      let yearStart;
+      if (today >= customYearStart) {
+        yearStart = customYearStart;
+      } else {
+        yearStart = new Date(
+          currentYear - 1, 
+          settings.custom_year_start_month - 1, 
+          settings.custom_year_start_day
+        );
+      }
+
+      // Calculate days spent in target country during current custom year
+      const countryDays = calculateDaysInCountry(flights, yearStart, today);
+      const totalDays = countryDays[target.country] || 0;
+
+      if (totalDays === 0) {
         recs.push({
           type: 'target',
           title: `Visit ${target.country}`,
-          description: `You haven't visited ${target.country} yet. Target: ${target.minimum_days} days minimum`,
+          description: `You haven't visited ${target.country} yet this year. Target: ${target.minimum_days} days minimum`,
           country: target.country,
           priority: 'medium'
         });
-      } else {
-        // Calculate total days spent
-        let totalDays = 0;
-        countryFlights.forEach(flight => {
-          if (flight.arrival_country === target.country) {
-            const arrivalDate = new Date(flight.arrival_date);
-            const departureDate = new Date(flight.departure_date);
-            const days = Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
-            totalDays += days;
-          }
+      } else if (totalDays < target.minimum_days) {
+        const remainingDays = target.minimum_days - totalDays;
+        recs.push({
+          type: 'target',
+          title: `More time needed in ${target.country}`,
+          description: `You've spent ${totalDays} days. Need ${remainingDays} more days to reach your ${target.minimum_days}-day target`,
+          country: target.country,
+          priority: 'medium'
         });
-
-        if (totalDays < target.minimum_days) {
-          const remainingDays = target.minimum_days - totalDays;
-          recs.push({
-            type: 'target',
-            title: `More time needed in ${target.country}`,
-            description: `You need ${remainingDays} more days to reach your ${target.minimum_days}-day target`,
-            country: target.country,
-            priority: 'medium'
-          });
-        }
       }
     });
 
