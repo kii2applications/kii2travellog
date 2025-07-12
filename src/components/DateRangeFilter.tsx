@@ -3,11 +3,8 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon } from 'lucide-react';
 import { format, parse } from 'date-fns';
-import { cn } from '@/lib/utils';
 import { DateRange } from 'react-day-picker';
 
 interface DateRangeFilterProps {
@@ -64,35 +61,35 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
   }, [dateRange.to]);
 
   return (
-    <Card className="bg-gray-900 border-gray-700">
+    <Card className="glass-card">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
-          <CalendarIcon className="h-5 w-5 text-purple-500" />
+        <CardTitle className="flex items-center gap-2 text-apple-text">
+          <CalendarIcon className="h-5 w-5 text-apple-blue" />
           Date Range Filter
         </CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardDescription className="text-apple-text-secondary">
           Select a date range to analyze your travel days
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">From Date</label>
+            <label className="text-sm font-medium text-apple-text">From Date</label>
             <Input
               type="date"
               value={fromInput}
               onChange={(e) => handleFromInputChange(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-apple-card-background border-apple-border text-apple-text"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white">To Date</label>
+            <label className="text-sm font-medium text-apple-text">To Date</label>
             <Input
               type="date"
               value={toInput}
               onChange={(e) => handleToInputChange(e.target.value)}
-              className="bg-gray-800 border-gray-600 text-white"
+              className="bg-apple-card-background border-apple-border text-apple-text"
             />
           </div>
         </div>
@@ -107,7 +104,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               thirtyDaysAgo.setDate(today.getDate() - 30);
               onDateRangeChange({ from: thirtyDaysAgo, to: today });
             }}
-            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            className="glass-button"
           >
             Last 30 days
           </Button>
@@ -120,7 +117,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               oneYearAgo.setFullYear(today.getFullYear() - 1);
               onDateRangeChange({ from: oneYearAgo, to: today });
             }}
-            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            className="glass-button"
           >
             Last year
           </Button>
@@ -132,7 +129,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               const startOfYear = new Date(today.getFullYear(), 0, 1);
               onDateRangeChange({ from: startOfYear, to: today });
             }}
-            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            className="glass-button"
           >
             This year
           </Button>
@@ -145,7 +142,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
               fiveYearsAgo.setFullYear(today.getFullYear() - 5);
               onDateRangeChange({ from: fiveYearsAgo, to: today });
             }}
-            className="bg-gray-800 border-gray-600 text-white hover:bg-gray-700"
+            className="glass-button"
           >
             Last 5 years
           </Button>
