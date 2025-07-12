@@ -25,21 +25,45 @@ export const RecommendationsPage: React.FC = () => {
     // Event-based recommendations
     events.forEach(event => {
       const eventDate = new Date(event.event_date);
-      const countryFlights = flights.filter(f => 
-        f.arrival_country === event.country || f.departure_country === event.country
-      );
+      const today = new Date();
+      const daysUntilEvent = Math.ceil((eventDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      // Only show recommendations for upcoming events
+      if (daysUntilEvent > 0) {
+        const countryFlights = flights.filter(f => 
+          f.arrival_country === event.country || f.departure_country === event.country
+        );
 
-      if (countryFlights.length === 0) {
-        // No flights to this country yet
-        const suggestedArrival = format(addDays(eventDate, -7), 'yyyy-MM-dd');
-        recs.push({
-          type: 'event',
-          title: `Plan travel for ${event.event_name}`,
-          description: `Consider arriving a week early to explore ${event.country} before your event`,
-          country: event.country,
-          suggestedDate: suggestedArrival,
-          priority: 'high'
-        });
+        if (countryFlights.length === 0) {
+          // No flights to this country yet
+          const suggestedArrival = format(addDays(eventDate, -7), 'yyyy-MM-dd');
+          recs.push({
+            type: 'event',
+            title: `Plan travel for ${event.event_name}`,
+            description: `Event in ${daysUntilEvent} days. Consider arriving a week early to explore ${event.country}`,
+            country: event.country,
+            suggestedDate: suggestedArrival,
+            priority: daysUntilEvent <= 30 ? 'high' : 'medium'
+          });
+        } else {
+          // Check if there's a flight that covers the event date
+          const hasFlightDuringEvent = countryFlights.some(flight => {
+            const arrivalDate = new Date(flight.arrival_date);
+            const departureDate = new Date(flight.departure_date);
+            return arrivalDate <= eventDate && departureDate >= eventDate;
+          });
+
+          if (!hasFlightDuringEvent) {
+            recs.push({
+              type: 'event',
+              title: `Adjust travel for ${event.event_name}`,
+              description: `You have flights to ${event.country} but may need to adjust dates to cover your event on ${format(eventDate, 'MMM d')}`,
+              country: event.country,
+              suggestedDate: format(addDays(eventDate, -3), 'yyyy-MM-dd'),
+              priority: daysUntilEvent <= 14 ? 'high' : 'medium'
+            });
+          }
+        }
       }
     });
 

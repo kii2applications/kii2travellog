@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { CountryStats } from '@/components/CountryStats';
+import { CurrentStatus } from '@/components/CurrentStatus';
 import { useUserSettings } from '@/hooks/useUserSettings';
 
 export const HomePage: React.FC = () => {
@@ -55,9 +56,12 @@ export const HomePage: React.FC = () => {
   }, [settings]);
 
   return (
-    <div className="max-w-md mx-auto bg-black min-h-screen p-4 space-y-6">
+    <div className="max-w-md mx-auto bg-apple-background min-h-screen p-4 space-y-6">
       {/* Mobile-first responsive layout */}
       <div className="space-y-6">
+        {/* Current Status */}
+        <CurrentStatus />
+        
         {/* Date Filter */}
         <DateRangeFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
         
