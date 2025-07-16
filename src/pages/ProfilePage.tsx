@@ -49,7 +49,7 @@ export const ProfilePage: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-4">
           <Button className="flex-1 bg-gray-700 hover:bg-gray-600 text-white">
             Edit Profile
           </Button>
@@ -58,6 +58,13 @@ export const ProfilePage: React.FC = () => {
           </Button>
           <Button variant="ghost" size="sm" className="p-2 text-white hover:bg-gray-800">
             <UserCheck className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Events Section */}
+        <div className="mb-6">
+          <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+            Add Important Events
           </Button>
         </div>
 
