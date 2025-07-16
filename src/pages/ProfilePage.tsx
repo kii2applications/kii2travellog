@@ -6,18 +6,30 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { useEvents } from '@/hooks/useEvents';
+import { useEvents, UserEvent } from '@/hooks/useEvents';
 import { EventForm } from '@/components/events/EventForm';
 import { format } from 'date-fns';
 
 export const ProfilePage: React.FC = () => {
   const { user } = useAuth();
-  const { events, addEvent, deleteEvent, isAddingEvent, isDeletingEvent } = useEvents();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { events, addEvent, updateEvent, deleteEvent, isAddingEvent, isUpdatingEvent, isDeletingEvent } = useEvents();
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<UserEvent | null>(null);
 
   const handleAddEvent = (eventData: any) => {
     addEvent(eventData);
-    setIsDialogOpen(false);
+    setIsAddDialogOpen(false);
+  };
+
+  const handleUpdateEvent = (eventData: any) => {
+    if (editingEvent) {
+      updateEvent({ id: editingEvent.id, event: eventData });
+      setEditingEvent(null);
+    }
+  };
+
+  const handleEditEvent = (event: UserEvent) => {
+    setEditingEvent(event);
   };
 
   const handleDeleteEvent = (eventId: string) => {
@@ -57,7 +69,7 @@ export const ProfilePage: React.FC = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="text-apple-text">Important Events</CardTitle>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="bg-apple-blue hover:bg-apple-blue/90">
                   <Plus className="h-4 w-4 mr-1" />
@@ -115,6 +127,7 @@ export const ProfilePage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleEditEvent(event)}
                           className="h-8 w-8 p-0 text-apple-text-secondary hover:text-apple-text"
                         >
                           <Edit2 className="h-3 w-3" />
@@ -136,6 +149,28 @@ export const ProfilePage: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Event Dialog */}
+      <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
+        <DialogContent className="bg-apple-background border-apple-border">
+          <DialogHeader>
+            <DialogTitle className="text-apple-text">Edit Event</DialogTitle>
+          </DialogHeader>
+          {editingEvent && (
+            <EventForm 
+              onSubmit={handleUpdateEvent} 
+              isLoading={isUpdatingEvent}
+              initialData={{
+                event_name: editingEvent.event_name,
+                country: editingEvent.country,
+                event_date: editingEvent.event_date,
+                description: editingEvent.description || '',
+              }}
+              submitButtonText="Update Event"
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

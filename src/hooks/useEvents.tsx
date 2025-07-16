@@ -86,12 +86,45 @@ export const useEvents = () => {
     },
   });
 
+  const updateEventMutation = useMutation({
+    mutationFn: async ({ id, event }: { id: string; event: Omit<UserEvent, 'id' | 'user_id' | 'created_at' | 'updated_at'> }) => {
+      const { data, error } = await supabase
+        .from('user_events')
+        .update({
+          ...event,
+          event_date: event.event_date,
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      toast({
+        title: "Event Updated",
+        description: "Your event has been successfully updated!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     events,
     isLoading,
     addEvent: addEventMutation.mutate,
+    updateEvent: updateEventMutation.mutate,
     deleteEvent: deleteEventMutation.mutate,
     isAddingEvent: addEventMutation.isPending,
+    isUpdatingEvent: updateEventMutation.isPending,
     isDeletingEvent: deleteEventMutation.isPending,
   };
 };

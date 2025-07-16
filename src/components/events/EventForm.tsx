@@ -21,11 +21,19 @@ type EventFormData = z.infer<typeof eventSchema>;
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void;
   isLoading?: boolean;
+  initialData?: Partial<EventFormData>;
+  submitButtonText?: string;
 }
 
-export const EventForm: React.FC<EventFormProps> = ({ onSubmit, isLoading }) => {
+export const EventForm: React.FC<EventFormProps> = ({ 
+  onSubmit, 
+  isLoading, 
+  initialData,
+  submitButtonText = 'Add Event'
+}) => {
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
+    defaultValues: initialData,
   });
 
   return (
@@ -95,7 +103,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onSubmit, isLoading }) => 
         />
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? 'Adding Event...' : 'Add Event'}
+          {isLoading ? 'Saving...' : submitButtonText}
         </Button>
       </form>
     </Form>
