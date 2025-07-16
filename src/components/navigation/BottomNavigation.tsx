@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Map, PlusSquare, Heart, Settings } from 'lucide-react';
+import { Home, Map, PlusSquare, Heart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigationItems = [
@@ -26,9 +26,9 @@ const navigationItems = [
     icon: Heart,
   },
   {
-    title: 'Settings',
-    href: '/settings',
-    icon: Settings,
+    title: 'Profile',
+    href: '/profile',
+    icon: User,
   },
 ];
 

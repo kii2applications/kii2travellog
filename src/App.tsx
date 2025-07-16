@@ -2,7 +2,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
-import Index from '@/pages/Index';
+import { HomePage } from '@/pages/HomePage';
+import { ProfilePage } from '@/pages/ProfilePage';
 import { FlightsPage } from '@/pages/FlightsPage';
 import { AddFlightPage } from '@/pages/AddFlightPage';
 import { RecommendationsPage } from '@/pages/RecommendationsPage';
@@ -42,7 +43,8 @@ function AppContent() {
       {/* Main Content */}
       <main className="pb-20 pt-16">
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/flights" element={<FlightsPage />} />
           <Route path="/add-flight" element={<AddFlightPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
