@@ -5,6 +5,7 @@ import { DateRange } from 'react-day-picker';
 import { DateRangeFilter } from '@/components/DateRangeFilter';
 import { CountryStats } from '@/components/CountryStats';
 import { CurrentStatus } from '@/components/CurrentStatus';
+import { UpcomingEvent } from '@/components/UpcomingEvent';
 import { useUserSettings } from '@/hooks/useUserSettings';
 
 export const HomePage: React.FC = () => {
@@ -61,6 +62,9 @@ export const HomePage: React.FC = () => {
       <div className="space-y-6">
         {/* Current Status */}
         <CurrentStatus />
+        
+        {/* Upcoming Event */}
+        <UpcomingEvent />
         
         {/* Date Filter */}
         <DateRangeFilter dateRange={dateRange} onDateRangeChange={setDateRange} />
