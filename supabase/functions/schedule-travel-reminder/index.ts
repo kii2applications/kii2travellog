@@ -1,8 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.9";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -46,6 +52,12 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('No authorization header');
     }
 
+    // Get user data
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader);
+    if (userError || !user) {
+      throw new Error('Invalid authorization token');
+    }
+
     // Calculate reminder date
     const eventDateObj = new Date(eventDate);
     const reminderDate = new Date(eventDateObj);
@@ -55,7 +67,7 @@ const handler = async (req: Request): Promise<Response> => {
     // In production, you'd schedule this with a cron job or queue system
     const emailResponse = await resend.emails.send({
       from: "Travel Planner <onboarding@resend.dev>",
-      to: ["user@example.com"], // In production, get from user profile
+      to: [user.email!],
       subject: `Travel Reminder: ${eventName} in ${eventCountry}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
