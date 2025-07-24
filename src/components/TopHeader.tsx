@@ -4,6 +4,7 @@ import { Map, Settings, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { PWAInstallButton } from '@/components/PWAInstallButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,7 @@ export const TopHeader: React.FC = () => {
 
         {/* Right actions */}
         <div className="flex items-center gap-2">
+          <PWAInstallButton />
           <Button 
             variant="ghost" 
             size="icon" 
