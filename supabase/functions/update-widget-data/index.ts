@@ -1,39 +1,102 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.9";
 
-const supabase = createClient(
-  Deno.env.get("SUPABASE_URL") ?? "",
-  Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-);
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Max-Age": "86400",
+  "Content-Security-Policy": "default-src 'self'",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { 
+      headers: corsHeaders,
+      status: 200
+    });
+  }
+
+  // Only allow POST requests
+  if (req.method !== "POST") {
+    console.log(`Invalid method: ${req.method}`);
+    return new Response(
+      JSON.stringify({ error: "Method not allowed" }), 
+      { 
+        status: 405, 
+        headers: { ...corsHeaders, "Content-Type": "application/json" } 
+      }
+    );
   }
 
   try {
-    const authHeader = req.headers.get("Authorization")?.replace("Bearer ", "");
-    if (!authHeader) {
-      throw new Error('No authorization header');
+    // Get and validate Authorization header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      console.log("Missing or invalid authorization header");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }), 
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
 
-    // Get user data
-    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader);
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("Missing Supabase environment variables");
+      return new Response(
+        JSON.stringify({ error: "Internal server error" }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get user data with proper error handling
+    const jwt = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
     if (userError || !user) {
-      throw new Error('Invalid authorization token');
+      console.log("Invalid user token:", userError?.message);
+      return new Response(
+        JSON.stringify({ error: "Invalid token" }), 
+        { 
+          status: 401, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
     }
 
-    // Get current days in country
-    const { data: flights } = await supabase
+    console.log(`Processing widget update for user: ${user.id}`);
+
+    // Get current days in country with error handling
+    const { data: flights, error: flightsError } = await supabase
       .from('flights')
       .select('*')
       .eq('user_id', user.id)
       .order('departure_date', { ascending: false });
+
+    if (flightsError) {
+      console.error("Error fetching flights:", flightsError);
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch flight data" }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
 
     let currentDays = 0;
     let currentCountry = "Not traveling";
@@ -54,14 +117,25 @@ serve(async (req) => {
       }
     }
 
-    // Get upcoming events
-    const { data: events } = await supabase
+    // Get upcoming events with error handling
+    const { data: events, error: eventsError } = await supabase
       .from('user_events')
       .select('*')
       .eq('user_id', user.id)
       .gte('event_date', new Date().toISOString().split('T')[0])
       .order('event_date', { ascending: true })
       .limit(1);
+
+    if (eventsError) {
+      console.error("Error fetching events:", eventsError);
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch event data" }), 
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, "Content-Type": "application/json" } 
+        }
+      );
+    }
 
     let nextEvent = null;
     if (events && events.length > 0) {
@@ -85,8 +159,8 @@ serve(async (req) => {
       lastUpdated: new Date().toISOString()
     };
 
-    // Note: In a real implementation, you'd write these to a storage bucket
-    // For now, we'll return the data for client-side handling
+    console.log("Widget data updated successfully");
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -98,11 +172,12 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error in update-widget-data function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       {
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
