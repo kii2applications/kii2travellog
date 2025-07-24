@@ -12,6 +12,7 @@ import { BottomNavigation } from '@/components/navigation/BottomNavigation';
 import { TopHeader } from '@/components/TopHeader';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useWidgetData } from '@/hooks/useWidgetData';
 import { Auth } from '@/components/auth/Auth';
 import './App.css';
 
@@ -19,6 +20,7 @@ const queryClient = new QueryClient();
 
 function AppContent() {
   const { user, loading } = useAuth();
+  useWidgetData(); // Update widget data for PWA widgets
 
   if (loading) {
     return (

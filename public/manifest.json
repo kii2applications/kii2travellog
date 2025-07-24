@@ -39,5 +39,57 @@
         }
       ]
     }
+  ],
+  "widgets": [
+    {
+      "name": "Days in Country",
+      "short_name": "Days Counter",
+      "description": "View your current days spent in country",
+      "tag": "days-counter",
+      "template": "days-widget",
+      "ms_ac_template": "/widgets/days-widget.html",
+      "data": "/widgets/days-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/placeholder.svg",
+          "sizes": "300x200",
+          "label": "Days in country widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/placeholder.svg",
+          "sizes": "114x114"
+        }
+      ],
+      "auth": false,
+      "update": 3600
+    },
+    {
+      "name": "Upcoming Events",
+      "short_name": "Events",
+      "description": "View your upcoming travel events",
+      "tag": "upcoming-events",
+      "template": "events-widget",
+      "ms_ac_template": "/widgets/events-widget.html",
+      "data": "/widgets/events-data.json",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/placeholder.svg",
+          "sizes": "300x200",
+          "label": "Upcoming events widget"
+        }
+      ],
+      "icons": [
+        {
+          "src": "/placeholder.svg",
+          "sizes": "114x114"
+        }
+      ],
+      "auth": false,
+      "update": 3600
+    }
   ]
 }
