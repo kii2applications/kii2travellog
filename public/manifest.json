@@ -40,8 +40,9 @@
       "url": "/?action=add-flight",
       "icons": [
         {
-          "src": "/placeholder.svg",
-          "sizes": "96x96"
+          "src": "/icon-192.png",
+          "sizes": "96x96",
+          "type": "image/png"
         }
       ]
     }
@@ -58,15 +59,16 @@
       "type": "application/json",
       "screenshots": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-512.png",
           "sizes": "300x200",
           "label": "Days in country widget"
         }
       ],
       "icons": [
         {
-          "src": "/placeholder.svg",
-          "sizes": "114x114"
+          "src": "/icon-192.png",
+          "sizes": "114x114",
+          "type": "image/png"
         }
       ],
       "auth": false,
@@ -83,15 +85,16 @@
       "type": "application/json",
       "screenshots": [
         {
-          "src": "/placeholder.svg",
+          "src": "/icon-512.png",
           "sizes": "300x200",
           "label": "Upcoming events widget"
         }
       ],
       "icons": [
         {
-          "src": "/placeholder.svg",
-          "sizes": "114x114"
+          "src": "/icon-192.png",
+          "sizes": "114x114",
+          "type": "image/png"
         }
       ],
       "auth": false,

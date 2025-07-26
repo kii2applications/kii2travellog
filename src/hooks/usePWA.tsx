@@ -31,6 +31,15 @@ export const usePWA = () => {
     // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsInstalled(true);
+    } else {
+      // For iOS Safari and other browsers that don't support beforeinstallprompt
+      // Show install button if not already installed and not in standalone mode
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+      
+      if (isIOS && !isInStandaloneMode) {
+        setIsInstallable(true);
+      }
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -43,14 +52,20 @@ export const usePWA = () => {
   }, []);
 
   const installApp = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-      setIsInstallable(false);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+      }
+    } else {
+      // For iOS Safari, show instructions
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        alert('To install this app on iOS:\n1. Tap the Share button in Safari\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" to confirm');
+      }
     }
   };
 
