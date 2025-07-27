@@ -13,6 +13,7 @@ import { TopHeader } from '@/components/TopHeader';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useWidgetData } from '@/hooks/useWidgetData';
+import { useAppBadge } from '@/hooks/useAppBadge';
 import { Auth } from '@/components/auth/Auth';
 import './App.css';
 
@@ -21,6 +22,7 @@ const queryClient = new QueryClient();
 function AppContent() {
   const { user, loading } = useAuth();
   useWidgetData(); // Update widget data for PWA widgets
+  useAppBadge(); // Update app icon badge with current stats
 
   if (loading) {
     return (
