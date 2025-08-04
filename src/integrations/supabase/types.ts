@@ -104,6 +104,48 @@ export type Database = {
         }
         Relationships: []
       }
+      reminders: {
+        Row: {
+          country: string | null
+          created_at: string
+          event_date: string | null
+          event_id: string | null
+          id: string
+          message: string | null
+          reminder_date: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          reminder_date: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          event_date?: string | null
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          reminder_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_events: {
         Row: {
           country: string
