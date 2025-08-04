@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Plane, Bell } from 'lucide-react';
 import { useEvents } from '@/hooks/useEvents';
 import { useFlights } from '@/hooks/useFlights';
+import { useReminders } from '@/hooks/useReminders';
 import { format, differenceInDays } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 export const UpcomingEvent: React.FC = () => {
   const { events, isLoading: eventsLoading } = useEvents();
   const { flights, isLoading: flightsLoading } = useFlights();
+  const { addReminder } = useReminders();
 
   const { upcomingEvent, currentCountry, needsTravel } = useMemo(() => {
     if (!events || events.length === 0 || !flights) {
@@ -43,23 +45,38 @@ export const UpcomingEvent: React.FC = () => {
     if (!upcomingEvent) return;
 
     try {
-      const { error } = await supabase.functions.invoke('schedule-travel-reminder', {
-        body: {
-          eventId: upcomingEvent.id,
-          eventDate: upcomingEvent.event_date,
-          eventName: upcomingEvent.event_name,
-          eventCountry: upcomingEvent.country,
-          currentCountry,
-          reminderDays: 10 // Default to 10 days before
-        }
+      // Calculate reminder date (10 days before event)
+      const eventDate = new Date(upcomingEvent.event_date);
+      const reminderDate = new Date(eventDate);
+      reminderDate.setDate(eventDate.getDate() - 10);
+
+      // Save reminder to database
+      addReminder({
+        title: `Travel Reminder: ${upcomingEvent.event_name}`,
+        message: `Don't forget to prepare for your trip to ${upcomingEvent.country}. You're currently in ${currentCountry}.`,
+        reminder_date: reminderDate.toISOString(),
+        event_date: upcomingEvent.event_date,
+        event_id: upcomingEvent.id,
+        country: upcomingEvent.country,
+        status: 'pending',
       });
 
-      if (error) throw error;
-
-      toast({
-        title: "Reminder Scheduled",
-        description: "You'll receive an email reminder 10 days before your event.",
-      });
+      // Also send email via edge function (optional)
+      try {
+        await supabase.functions.invoke('schedule-travel-reminder', {
+          body: {
+            eventId: upcomingEvent.id,
+            eventDate: upcomingEvent.event_date,
+            eventName: upcomingEvent.event_name,
+            eventCountry: upcomingEvent.country,
+            currentCountry,
+            reminderDays: 10
+          }
+        });
+      } catch (emailError) {
+        console.log('Email reminder failed:', emailError);
+        // Don't throw here - the reminder is still saved to database
+      }
     } catch (error: any) {
       toast({
         title: "Error",

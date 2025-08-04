@@ -8,6 +8,7 @@ import { FlightsPage } from '@/pages/FlightsPage';
 import { AddFlightPage } from '@/pages/AddFlightPage';
 import { RecommendationsPage } from '@/pages/RecommendationsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
+import RemindersPage from '@/pages/RemindersPage';
 import { BottomNavigation } from '@/components/navigation/BottomNavigation';
 import { TopHeader } from '@/components/TopHeader';
 import { ThemeProvider } from '@/contexts/ThemeContext';
@@ -52,6 +53,7 @@ function AppContent() {
           <Route path="/flights" element={<FlightsPage />} />
           <Route path="/add-flight" element={<AddFlightPage />} />
           <Route path="/recommendations" element={<RecommendationsPage />} />
+          <Route path="/reminders" element={<RemindersPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </main>
