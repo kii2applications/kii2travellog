@@ -7,18 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { CalendarIcon, Edit, Plus, Trash2 } from 'lucide-react';
-import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
 
 interface ReminderFormData {
   title: string;
   message?: string;
-  reminder_date: Date;
-  event_date?: Date;
+  reminder_date: string;
+  event_date?: string;
   country?: string;
   status: 'pending' | 'sent' | 'cancelled';
 }
@@ -42,15 +39,15 @@ export const RemindersManager = () => {
         id: editingReminder.id,
         reminder: {
           ...data,
-          reminder_date: data.reminder_date.toISOString(),
-          event_date: data.event_date?.toISOString(),
+          reminder_date: data.reminder_date,
+          event_date: data.event_date,
         },
       });
     } else {
       addReminder({
         ...data,
-        reminder_date: data.reminder_date.toISOString(),
-        event_date: data.event_date?.toISOString(),
+        reminder_date: data.reminder_date,
+        event_date: data.event_date,
       });
     }
     handleCloseDialog();
@@ -58,11 +55,14 @@ export const RemindersManager = () => {
 
   const handleEdit = (reminder: Reminder) => {
     setEditingReminder(reminder);
+    const reminderDate = new Date(reminder.reminder_date);
+    const eventDate = reminder.event_date ? new Date(reminder.event_date) : undefined;
+    
     form.reset({
       title: reminder.title,
       message: reminder.message || '',
-      reminder_date: new Date(reminder.reminder_date),
-      event_date: reminder.event_date ? new Date(reminder.event_date) : undefined,
+      reminder_date: reminderDate.toISOString().slice(0, 16), // Format for datetime-local
+      event_date: eventDate ? eventDate.toISOString().slice(0, 16) : undefined,
       country: reminder.country || '',
       status: reminder.status,
     });
@@ -146,37 +146,31 @@ export const RemindersManager = () => {
                   control={form.control}
                   name="reminder_date"
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem>
                       <FormLabel>Reminder Date & Time</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP p")
-                              ) : (
-                                <span>Pick a date and time</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                            className="pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <FormControl>
+                        <Input
+                          type="datetime-local"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="event_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Date (optional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="datetime-local"
+                          {...field}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
