@@ -79,6 +79,18 @@ export const RemindersManager = () => {
     });
   };
 
+  const createTestReminder = () => {
+    const now = new Date();
+    const testTime = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes from now
+    
+    addReminder({
+      title: 'Test Reminder',
+      message: 'This is a test reminder to verify the system is working',
+      reminder_date: testTime.toISOString(),
+      status: 'pending',
+    });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'bg-blue-500';
@@ -96,13 +108,17 @@ export const RemindersManager = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">My Reminders</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setEditingReminder(null)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Reminder
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={createTestReminder}>
+            Create Test Reminder
+          </Button>
+           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setEditingReminder(null)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Reminder
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
@@ -200,8 +216,9 @@ export const RemindersManager = () => {
                 </div>
               </form>
             </Form>
-          </DialogContent>
-        </Dialog>
+           </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {reminders.length === 0 ? (
@@ -243,11 +260,11 @@ export const RemindersManager = () => {
                   {reminder.message && (
                     <p className="text-sm text-muted-foreground">{reminder.message}</p>
                   )}
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-1">
-                      <CalendarIcon className="w-4 h-4" />
-                      {format(new Date(reminder.reminder_date), "PPP p")}
-                    </span>
+                   <div className="flex items-center gap-4 text-sm">
+                     <span className="flex items-center gap-1">
+                       <CalendarIcon className="w-4 h-4" />
+                       {format(new Date(reminder.reminder_date), "PPP p")} ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+                     </span>
                     {reminder.country && (
                       <span className="text-muted-foreground">📍 {reminder.country}</span>
                     )}
