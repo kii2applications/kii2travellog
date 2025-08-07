@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useReminders, Reminder } from '@/hooks/useReminders';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -79,16 +80,43 @@ export const RemindersManager = () => {
     });
   };
 
-  const createTestReminder = () => {
+  const createTestReminder = async () => {
     const now = new Date();
     const testTime = new Date(now.getTime() + 2 * 60 * 1000); // 2 minutes from now
     
-    addReminder({
+    const testReminder = {
       title: 'Test Reminder',
-      message: 'This is a test reminder to verify the system is working',
+      message: 'This is a test reminder to verify the email notification system is working',
       reminder_date: testTime.toISOString(),
-      status: 'pending',
-    });
+      status: 'pending' as const,
+    };
+
+    try {
+      // Add the reminder to database
+      addReminder(testReminder);
+
+      // Generate a test ID for the notification
+      const testId = `test-${Date.now()}`;
+
+      // Send test email notification
+      const { data, error } = await supabase.functions.invoke('send-reminder-notification', {
+        body: {
+          reminderId: testId,
+          title: testReminder.title,
+          message: testReminder.message,
+          reminderDate: testReminder.reminder_date,
+          country: 'Test Location'
+        }
+      });
+
+      if (error) {
+        console.error('Error sending test notification:', error);
+      } else {
+        console.log('Test notification sent successfully:', data);
+      }
+    } catch (error) {
+      console.error('Error creating test reminder:', error);
+    }
   };
 
   const getStatusColor = (status: string) => {
