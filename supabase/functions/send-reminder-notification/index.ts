@@ -139,11 +139,26 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email using Resend
     const emailResponse = await resend.emails.send({
-      from: "Reminders <onboarding@resend.dev>",
+      from: "Reminders <noreply@kii2connect.com>",
       to: [user.email],
       subject: `🔔 Reminder: ${title}`,
       html: emailContent,
     });
+
+    if (emailResponse.error) {
+      console.error("Resend email error:", emailResponse.error);
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: emailResponse.error,
+          message: "Failed to send reminder notification",
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     console.log("Email sent successfully:", emailResponse);
 
