@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, Calendar, MapPin } from 'lucide-react';
+import { Plus, Edit2, Trash2, Calendar, MapPin, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useEvents, UserEvent } from '@/hooks/useEvents';
 import { EventForm } from '@/components/events/EventForm';
+import { ReminderDialog } from '@/components/ReminderDialog';
 import { format } from 'date-fns';
 
 export const ProfilePage: React.FC = () => {
@@ -15,6 +16,7 @@ export const ProfilePage: React.FC = () => {
   const { events, addEvent, updateEvent, deleteEvent, isAddingEvent, isUpdatingEvent, isDeletingEvent } = useEvents();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<UserEvent | null>(null);
+  const [reminderEvent, setReminderEvent] = useState<UserEvent | null>(null);
 
   const handleAddEvent = (eventData: any) => {
     addEvent(eventData);
@@ -36,6 +38,10 @@ export const ProfilePage: React.FC = () => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       deleteEvent(eventId);
     }
+  };
+
+  const handleSetReminder = (event: UserEvent) => {
+    setReminderEvent(event);
   };
 
   return (
@@ -127,6 +133,15 @@ export const ProfilePage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
+                          onClick={() => handleSetReminder(event)}
+                          className="h-8 w-8 p-0 text-apple-text-secondary hover:text-apple-blue"
+                          title="Set Reminder"
+                        >
+                          <Bell className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleEditEvent(event)}
                           className="h-8 w-8 p-0 text-apple-text-secondary hover:text-apple-text"
                         >
@@ -171,6 +186,15 @@ export const ProfilePage: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Reminder Dialog */}
+      {reminderEvent && (
+        <ReminderDialog
+          isOpen={!!reminderEvent}
+          onOpenChange={(open) => !open && setReminderEvent(null)}
+          event={reminderEvent}
+        />
+      )}
     </div>
   );
 };
