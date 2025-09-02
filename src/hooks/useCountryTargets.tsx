@@ -20,6 +20,9 @@ export const useCountryTargets = () => {
   const { data: targets = [], isLoading } = useQuery({
     queryKey: ['country-targets'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('country_targets')
         .select('*')
@@ -28,6 +31,7 @@ export const useCountryTargets = () => {
       if (error) throw error;
       return data as CountryTarget[];
     },
+    enabled: true,
   });
 
   const addTargetMutation = useMutation({

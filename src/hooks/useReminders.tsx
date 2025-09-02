@@ -22,6 +22,9 @@ export const useReminders = () => {
   const { data: reminders = [], isLoading } = useQuery({
     queryKey: ['reminders'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('reminders')
         .select('*')
@@ -30,6 +33,7 @@ export const useReminders = () => {
       if (error) throw error;
       return data as Reminder[];
     },
+    enabled: true,
   });
 
   const addReminderMutation = useMutation({

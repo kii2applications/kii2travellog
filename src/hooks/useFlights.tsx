@@ -20,6 +20,9 @@ export const useFlights = () => {
   const { data: flights = [], isLoading } = useQuery({
     queryKey: ['flights'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('flights')
         .select('*')
@@ -28,6 +31,7 @@ export const useFlights = () => {
       if (error) throw error;
       return data as Flight[];
     },
+    enabled: true,
   });
 
   const addFlightMutation = useMutation({

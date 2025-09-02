@@ -20,6 +20,9 @@ export const useEvents = () => {
   const { data: events = [], isLoading } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
       const { data, error } = await supabase
         .from('user_events')
         .select('*')
@@ -28,6 +31,7 @@ export const useEvents = () => {
       if (error) throw error;
       return data as UserEvent[];
     },
+    enabled: true,
   });
 
   const addEventMutation = useMutation({

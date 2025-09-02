@@ -18,6 +18,14 @@ export const useUserSettings = () => {
   const { data: settings, isLoading } = useQuery({
     queryKey: ['user-settings'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        return {
+          custom_year_start_month: 4, // April
+          custom_year_start_day: 1,   // 1st
+        };
+      }
+
       const { data, error } = await supabase
         .from('user_settings')
         .select('*')
@@ -37,6 +45,7 @@ export const useUserSettings = () => {
       
       return data as UserSettings;
     },
+    enabled: true,
   });
 
   const updateSettingsMutation = useMutation({
