@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface Reminder {
   id: string;
@@ -18,22 +19,20 @@ export interface Reminder {
 
 export const useReminders = () => {
   const queryClient = useQueryClient();
+  const { session } = useAuth();
 
   const { data: reminders = [], isLoading } = useQuery({
-    queryKey: ['reminders'],
+    queryKey: ['reminders', session?.user?.id],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
       const { data, error } = await supabase
         .from('reminders')
         .select('*')
         .order('reminder_date', { ascending: true });
-
       if (error) throw error;
       return data as Reminder[];
     },
-    enabled: true,
+    enabled: !!session,
+    retry: (failureCount, _error) => failureCount < 1,
   });
 
   const addReminderMutation = useMutation({

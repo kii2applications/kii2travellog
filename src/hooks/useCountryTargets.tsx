@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export interface CountryTarget {
   id: string;
@@ -16,22 +17,19 @@ export interface CountryTarget {
 
 export const useCountryTargets = () => {
   const queryClient = useQueryClient();
-
+  const { session } = useAuth();
   const { data: targets = [], isLoading } = useQuery({
-    queryKey: ['country-targets'],
+    queryKey: ['country-targets', session?.user?.id],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
       const { data, error } = await supabase
         .from('country_targets')
         .select('*')
         .order('country', { ascending: true });
-
       if (error) throw error;
       return data as CountryTarget[];
     },
-    enabled: true,
+    enabled: !!session,
+    retry: (failureCount, _error) => failureCount < 1,
   });
 
   const addTargetMutation = useMutation({
