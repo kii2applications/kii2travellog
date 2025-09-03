@@ -42,18 +42,6 @@
     --shadow-medium: 0 8px 30px -8px hsl(0 0% 0% / 0.12);
     --transition-smooth: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     
-    /* Apple theme colors */
-    --apple-background: 0 0% 98%;
-    --apple-text: 0 0% 8%;
-    --apple-text-secondary: 0 0% 45%;
-    --apple-card: 0 0% 100%;
-    --apple-border: 0 0% 90%;
-    --apple-blue: 211 100% 50%;
-    --apple-green: 142 76% 36%;
-    --apple-orange: 24 95% 53%;
-    --apple-purple: 280 100% 70%;
-    --apple-pink: 330 81% 60%;
-    
     --sidebar-background: 0 0% 97%;
     --sidebar-foreground: 0 0% 20%;
     --sidebar-primary: 211 100% 50%;
@@ -98,18 +86,6 @@
     --glass-bg: 0 0% 10% / 0.8;
     --shadow-soft: 0 2px 20px -2px hsl(0 0% 0% / 0.3);
     --shadow-medium: 0 8px 30px -8px hsl(0 0% 0% / 0.4);
-    
-    /* Apple dark theme colors */
-    --apple-background: 0 0% 8%;
-    --apple-text: 0 0% 95%;
-    --apple-text-secondary: 0 0% 65%;
-    --apple-card: 0 0% 12%;
-    --apple-border: 0 0% 22%;
-    --apple-blue: 211 100% 55%;
-    --apple-green: 142 76% 45%;
-    --apple-orange: 24 95% 60%;
-    --apple-purple: 280 100% 75%;
-    --apple-pink: 330 81% 65%;
     
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 0 0% 85%;

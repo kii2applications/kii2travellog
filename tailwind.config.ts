@@ -66,17 +66,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				glass: 'hsl(var(--glass-bg))',
-				'apple-background': 'hsl(var(--apple-background))',
-				'apple-text': 'hsl(var(--apple-text))',
-				'apple-text-secondary': 'hsl(var(--apple-text-secondary))',
-				'apple-card': 'hsl(var(--apple-card))',
-				'apple-border': 'hsl(var(--apple-border))',
-				'apple-blue': 'hsl(var(--apple-blue))',
-				'apple-green': 'hsl(var(--apple-green))',
-				'apple-orange': 'hsl(var(--apple-orange))',
-				'apple-purple': 'hsl(var(--apple-purple))',
-				'apple-pink': 'hsl(var(--apple-pink))'
+				glass: 'hsl(var(--glass-bg))'
 			},
 			boxShadow: {
 				'soft': 'var(--shadow-soft)',
