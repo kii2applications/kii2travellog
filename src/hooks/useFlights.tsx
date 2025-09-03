@@ -2,7 +2,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 
 export interface Flight {
   id: string;
@@ -17,19 +16,18 @@ export interface Flight {
 
 export const useFlights = () => {
   const queryClient = useQueryClient();
-  const { session } = useAuth();
+
   const { data: flights = [], isLoading } = useQuery({
-    queryKey: ['flights', session?.user?.id],
+    queryKey: ['flights'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('flights')
         .select('*')
         .order('departure_date', { ascending: false });
+
       if (error) throw error;
       return data as Flight[];
     },
-    enabled: !!session,
-    retry: (failureCount, _error) => failureCount < 1,
   });
 
   const addFlightMutation = useMutation({

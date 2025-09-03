@@ -2,7 +2,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/useAuth';
 
 export interface UserEvent {
   id: string;
@@ -17,19 +16,18 @@ export interface UserEvent {
 
 export const useEvents = () => {
   const queryClient = useQueryClient();
-  const { session } = useAuth();
+
   const { data: events = [], isLoading } = useQuery({
-    queryKey: ['events', session?.user?.id],
+    queryKey: ['events'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('user_events')
         .select('*')
         .order('event_date', { ascending: true });
+
       if (error) throw error;
       return data as UserEvent[];
     },
-    enabled: !!session,
-    retry: (failureCount, _error) => failureCount < 1,
   });
 
   const addEventMutation = useMutation({
